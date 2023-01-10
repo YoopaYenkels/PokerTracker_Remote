@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C74D32F8296CF28600654DE6 /* Poker_TrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74D32F7296CF28600654DE6 /* Poker_TrackerApp.swift */; };
-		C74D32FA296CF28600654DE6 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74D32F9296CF28600654DE6 /* ContentView.swift */; };
+		C74D32FA296CF28600654DE6 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74D32F9296CF28600654DE6 /* MainView.swift */; };
 		C74D32FC296CF28800654DE6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C74D32FB296CF28800654DE6 /* Assets.xcassets */; };
 		C74D32FF296CF28800654DE6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C74D32FE296CF28800654DE6 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
@@ -16,7 +16,7 @@
 /* Begin PBXFileReference section */
 		C74D32F4296CF28600654DE6 /* Poker Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Poker Tracker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C74D32F7296CF28600654DE6 /* Poker_TrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Poker_TrackerApp.swift; sourceTree = "<group>"; };
-		C74D32F9296CF28600654DE6 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C74D32F9296CF28600654DE6 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		C74D32FB296CF28800654DE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C74D32FE296CF28800654DE6 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -52,7 +52,7 @@
 			isa = PBXGroup;
 			children = (
 				C74D32F7296CF28600654DE6 /* Poker_TrackerApp.swift */,
-				C74D32F9296CF28600654DE6 /* ContentView.swift */,
+				C74D32F9296CF28600654DE6 /* MainView.swift */,
 				C74D32FB296CF28800654DE6 /* Assets.xcassets */,
 				C74D32FD296CF28800654DE6 /* Preview Content */,
 			);
@@ -137,7 +137,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C74D32FA296CF28600654DE6 /* ContentView.swift in Sources */,
+				C74D32FA296CF28600654DE6 /* MainView.swift in Sources */,
 				C74D32F8296CF28600654DE6 /* Poker_TrackerApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
