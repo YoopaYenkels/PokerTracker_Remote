@@ -8,34 +8,27 @@
 import Foundation
 import SwiftUI
 
+// this view creates and owns the players list object
 struct PlayerManager: View {
-    @Environment(\.dismiss) var dismiss
+    @State private var showAddPlayer = false
+    
+    @ObservedObject var observedPlayersList: PlayersList
     
     var body: some View {
         VStack {
-            HStack {
-                Text("Manage Players")
-                    .font(.system(size: 32, weight: .bold))
-                    .frame(width: 240, alignment: .leading)
-                Button() {
-                    dismiss()
-                } label: {
-                    Text("Done")
-                        .font(.system(size: 24, weight: .bold))
-                        .frame(width: 100, alignment: .trailing)
-                        .foregroundColor(.blue)
-                }
-            }.padding(.top, 30)
+            Text("Manage Players")
+                .font(.system(size: 24, weight: .bold))
             
             List {
-                ForEach(players) {player in
+                ForEach(observedPlayersList.players) {player in
                     PlayerRowView(player: player)
                 }
+                .onDelete(perform: observedPlayersList.deletePlayer)
             }
             
             HStack {
-                Button() {
-                    
+                Button {
+                    showAddPlayer.toggle()
                 } label: {
                     Image(systemName: "plus.circle.fill")
                         .resizable()
@@ -44,18 +37,16 @@ struct PlayerManager: View {
                     Text("Add Player")
                         .font(.system(size: 20, weight: .regular))
                         .foregroundColor(.blue)
+                }.sheet(isPresented: $showAddPlayer) {
+                    AddPlayer(observedPlayersList: observedPlayersList)
+                        .presentationDetents([.medium])
                 }
-                Spacer()
-                Button() {
-                    
-                } label: {
-                    Text("Edit")
-                        .font(.system(size: 20, weight: .regular))
-                        .foregroundColor(.blue)
-                }
+                
             }.padding()
         }
+        
     }
+    
 }
 
 struct Player: Identifiable {
@@ -64,18 +55,13 @@ struct Player: Identifiable {
     var money: Int
 }
 
-
-var players = [
-    Player(name: "Daki", money: 300),
-    Player(name: "Nike", money: 400),
-    Player(name: "Daddy", money: 800),
-    Player(name: "Julenisse", money: 300),
-    Player(name: "Mommy", money: 600),
-    Player(name: "Jupiter", money: 100),
-    Player(name: "Maul", money: 900),
-    Player(name: "Beary Bear", money: 500),
-    Player(name: "Goldie", money: 500)
-]
+class PlayersList: ObservableObject {
+    @Published var players: [Player] = []
+    
+    func deletePlayer(index: IndexSet) {
+        players.remove(atOffsets: index)
+    }
+}
 
 struct PlayerRowView: View {
     var player: Player
@@ -86,11 +72,10 @@ struct PlayerRowView: View {
             
             Spacer()
             
-            Label("\(player.money)", systemImage: "dollarsign.circle")
-            
+            Label("\(player.money)", systemImage: "dollarsign.circle")  
                 .foregroundColor(.secondary)
-            .font(.system(size: 24, weight: .light))
-        }.frame(height: 40)
+                .font(.system(size: 24, weight: .light))
+        }.frame(height: 20)
     }
 }
 

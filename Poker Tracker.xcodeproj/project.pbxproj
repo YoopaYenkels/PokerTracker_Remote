@@ -12,6 +12,7 @@
 		C74D32FC296CF28800654DE6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C74D32FB296CF28800654DE6 /* Assets.xcassets */; };
 		C74D32FF296CF28800654DE6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C74D32FE296CF28800654DE6 /* Preview Assets.xcassets */; };
 		C7F02F58296DBAFF0021F341 /* PlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F02F57296DBAFF0021F341 /* PlayerManager.swift */; };
+		C7F02F5A296E1F710021F341 /* AddPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F02F59296E1F710021F341 /* AddPlayer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +22,7 @@
 		C74D32FB296CF28800654DE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C74D32FE296CF28800654DE6 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C7F02F57296DBAFF0021F341 /* PlayerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerManager.swift; sourceTree = "<group>"; };
+		C7F02F59296E1F710021F341 /* AddPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPlayer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +58,7 @@
 				C74D32F7296CF28600654DE6 /* Poker_TrackerApp.swift */,
 				C74D32F9296CF28600654DE6 /* MainView.swift */,
 				C7F02F57296DBAFF0021F341 /* PlayerManager.swift */,
+				C7F02F59296E1F710021F341 /* AddPlayer.swift */,
 				C74D32FB296CF28800654DE6 /* Assets.xcassets */,
 				C74D32FD296CF28800654DE6 /* Preview Content */,
 			);
@@ -140,6 +143,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C7F02F5A296E1F710021F341 /* AddPlayer.swift in Sources */,
 				C74D32FA296CF28600654DE6 /* MainView.swift in Sources */,
 				C74D32F8296CF28600654DE6 /* Poker_TrackerApp.swift in Sources */,
 				C7F02F58296DBAFF0021F341 /* PlayerManager.swift in Sources */,
@@ -279,6 +283,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -308,6 +313,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
