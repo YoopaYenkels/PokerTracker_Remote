@@ -12,7 +12,7 @@ struct AddPlayer:View {
     @Environment(\.dismiss) var dismiss
     
     @State private var name = ""
-    @State private var startingMoney = 100
+    @State private var startingMoney = 250
     
     @ObservedObject var observedPlayersList: PlayersList
     
@@ -20,16 +20,20 @@ struct AddPlayer:View {
         NavigationView {
             Form {
                 TextField("Enter Name", text: $name)
-                Picker("Starting Money:", selection: $startingMoney) {
-                    ForEach(1...500, id:\.self) {
-                        Text("\($0)")
+                Stepper(value: $startingMoney, in: 1...500) {
+                    VStack {
+                        Text("Starting Money")
+                        Label("\(startingMoney)", systemImage: "dollarsign.circle")
                     }
+                    
                 }
             }
             .navigationTitle("Add Player")
             .toolbar {
                 Button {
-                    name != "" ? observedPlayersList.players.append(Player(name: name, money: startingMoney)) : dismiss()
+                    name != "" ?
+                    observedPlayersList.players
+                        .append(Player(name: name, money: startingMoney)) : dismiss()
                     dismiss()
                 } label: {
                     Text("Done")

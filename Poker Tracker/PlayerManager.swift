@@ -83,7 +83,7 @@ struct PlayerRowView: View {
     var body: some View {
         HStack {
             Text(player.name)
-                .font(.system(size: 30, weight: .regular))
+                .font(.system(size: 20, weight: .regular))
             
             Spacer()
             
