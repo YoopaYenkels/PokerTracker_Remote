@@ -14,70 +14,50 @@ struct MainView: View {
     
     
     var body: some View {
-            NavigationStack {
-               ZStack {
-                    //Color("bgColor1").ignoresSafeArea(.all)
-                    VStack {
-                        VStack {
-                            Divider()
-                                .frame(width: 300, height: 4)
-                                .overlay(.black)
-                            Text("Pot")
-                                .font(.system(size: 40, weight: .regular))
-
-                            Text("$0")
-                                .font(.system(size: 40, weight: .light))
-                            
-                            Image(systemName: "heart.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 34, height: 34)
-                                .foregroundColor(.red)
-                                .padding(.bottom, 30)
-                            Divider()
-                                .frame(width: 300, height: 4)
-                                .overlay(.black)
-                        }.padding(.top, 50)
-                        
-                      
-                        
-                        if playersList.players.isEmpty {
-                            Text("(No Players)")
-                                .font(.system(size: 30, weight: .regular))
-                                .padding(.top, 30)
-                        } else {
-                            List {
-                                ForEach(playersList.players) {player in
-                                    PlayerHomeScreenView(player: player)
-                                }
-                            }
-                            .background(.white)
-                            .scrollContentBackground(.hidden)
-                        }
-                        
-                        Spacer()
-                    }
-               }
-                .navigationTitle("Poker Tracker")
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading){
-                        NavigationLink (destination: PlayerManager(observedPlayersList: playersList)) {
-
-                            Image(systemName: "person.badge.plus")
-                                .imageScale(.large)
+        NavigationStack {
+            ZStack {
+                //Color("bgColor1").ignoresSafeArea(.all)
+                PotView()
+                
+                
+                
+                if playersList.players.isEmpty {
+                    Text("(No Players)")
+                        .font(.system(size: 30, weight: .regular))
+                        .padding(.top, 30)
+                } else {
+                    List {
+                        ForEach(playersList.players) {player in
+                            PlayerHomeScreenView(player: player)
                         }
                     }
+                    .background(.white)
+                    .scrollContentBackground(.hidden)
+                }
+                
+                Spacer()
+            }
+        }
+        .navigationTitle("Poker Tracker")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading){
+                NavigationLink (destination: PlayerManager(observedPlayersList: playersList)) {
                     
-                    ToolbarItem(placement: .navigationBarTrailing){
-                        NavigationLink (destination: {}) {
-                            Image(systemName: "gear")
-                                .imageScale(.large)
-                        }
-                    }
+                    Image(systemName: "person.badge.plus")
+                        .imageScale(.large)
                 }
             }
+            
+            ToolbarItem(placement: .navigationBarTrailing){
+                NavigationLink (destination: {}) {
+                    Image(systemName: "gear")
+                        .imageScale(.large)
+                }
+            }
+        }
     }
 }
+
 
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
@@ -109,6 +89,34 @@ struct PlayerHomeScreenView: View {
     }
 }
 
+
+struct PotView: View {
+    var body: some View {
+        VStack {
+            VStack {
+                Divider()
+                    .frame(width: 300, height: 4)
+                    .overlay(.black)
+                Text("Pot")
+                    .font(.system(size: 40, weight: .regular))
+                
+                Text("$0")
+                    .font(.system(size: 40, weight: .light))
+                
+                Image(systemName: "heart.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 34, height: 34)
+                    .foregroundColor(.red)
+                    .padding(.bottom, 30)
+                Divider()
+                    .frame(width: 300, height: 4)
+                    .overlay(.black)
+            }.padding(.top, 50)
+        }
+    }
+    
+}
 //struct ActionsView: View {
 //    var body: some View {
 //        HStack (spacing: 20) {
