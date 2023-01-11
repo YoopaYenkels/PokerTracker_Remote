@@ -11,38 +11,49 @@ import SwiftUI
 // this view creates and owns the players list object
 struct PlayerManager: View {
     @State private var showAddPlayer = false
-    
+
     @ObservedObject var observedPlayersList: PlayersList
     
     var body: some View {
-        VStack {
-            Text("Manage Players")
-                .font(.system(size: 24, weight: .bold))
-            
-            List {
-                ForEach(observedPlayersList.players) {player in
-                    PlayerRowView(player: player)
+        NavigationStack {
+            VStack {
+                List {
+                    ForEach(observedPlayersList.players) {player in
+                        PlayerRowView(player: player)
+                    }
+                    .onDelete(perform: observedPlayersList.deletePlayer)
                 }
-                .onDelete(perform: observedPlayersList.deletePlayer)
+
+                HStack {
+                    Button {
+                        showAddPlayer.toggle()
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 26, height: 26, alignment: .leading)
+                        Text("Add Player")
+                            .font(.system(size: 20, weight: .regular))
+                            .foregroundColor(.blue)
+                    }.sheet(isPresented: $showAddPlayer) {
+                        AddPlayer(observedPlayersList: observedPlayersList)
+                            .presentationDetents([.medium])
+                    }
+
+                }.padding()
             }
-            
-            HStack {
+        }
+        .navigationBarTitle("Manage Players")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing){
                 Button {
-                    showAddPlayer.toggle()
+                    observedPlayersList.deleteAllPlayers()
                 } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 26, height: 26, alignment: .leading)
-                    Text("Add Player")
-                        .font(.system(size: 20, weight: .regular))
-                        .foregroundColor(.blue)
-                }.sheet(isPresented: $showAddPlayer) {
-                    AddPlayer(observedPlayersList: observedPlayersList)
-                        .presentationDetents([.medium])
+                    Image(systemName: "trash")
+                        .imageScale(.large)
                 }
-                
-            }.padding()
+            }
         }
         
     }
@@ -60,6 +71,10 @@ class PlayersList: ObservableObject {
     
     func deletePlayer(index: IndexSet) {
         players.remove(atOffsets: index)
+    }
+    
+    func deleteAllPlayers() {
+        players.removeAll()
     }
 }
 

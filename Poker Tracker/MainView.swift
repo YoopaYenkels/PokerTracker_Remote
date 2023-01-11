@@ -10,22 +10,19 @@ import SwiftUI
 struct MainView: View {
     
     @StateObject var playersList: PlayersList = PlayersList()
+    @State var potAmount = 0
     
     var body: some View {
-            NavigationView {
+            NavigationStack {
                 ZStack {
-                    Color("bgColor1").ignoresSafeArea(.all)
+                    //Color("bgColor1").ignoresSafeArea(.all)
                     VStack {                  
                         VStack {
                             Text("Pot")
-                                .foregroundColor(.white)
                                 .font(.system(size: 40, weight: .regular))
-                                .frame(width: 300)
-                                .padding(.top, 20)
+    
                             Text("$2000")
-                                .foregroundColor(.white)
                                 .font(.system(size: 40, weight: .light))
-                                .frame(width: 300)
                             
                             Image(systemName: "heart.fill")
                                 .resizable()
@@ -37,37 +34,36 @@ struct MainView: View {
                                 PlayerInfoText(text: "Daki")
                                 Spacer()
                                 PlayerInfoText(text: "$450")
-                            }.padding()
+                            }.padding(.horizontal, 60)
+                            
                         }
                         
-                        Spacer()
                         
-                        HStack (spacing: 20) {
-                            ActionButton(text: "Call")
-                                .font(.system(size: 30, weight: .bold))
-                                .background(.green)
-                                .cornerRadius(10)
-                            ActionButton(text: "Raise")
-                                .font(.system(size: 30, weight: .bold))
-                                .background(.blue)
-                                .cornerRadius(10)
-                            ActionButton(text: "Fold")
-                                .font(.system(size: 30, weight: .bold))
-                                .background(.red)
-                                .cornerRadius(10)
-                        }.padding()
+                        
+//                        HStack (spacing: 20) {
+//                            ActionButton(text: "Call")
+//                                .font(.system(size: 30, weight: .bold))
+//                                .background(Color("bgColor1"))
+//                                .cornerRadius(10)
+//                            ActionButton(text: "Raise")
+//                                .font(.system(size: 30, weight: .bold))
+//                                .background(.blue)
+//                                .cornerRadius(10)
+//                            ActionButton(text: "Fold")
+//                                .font(.system(size: 30, weight: .bold))
+//                                .background(.red)
+//                                .cornerRadius(10)
+//                        }.padding()
                     }
                 }
                 .navigationTitle("Poker Tracker")
                 .toolbar {
-                    NavigationLink (destination: PlayerManager(observedPlayersList: playersList)) {
+                    ToolbarItem(placement: .navigationBarLeading){
+                        NavigationLink (destination: PlayerManager(observedPlayersList: playersList)) {
 
-                        Image(systemName: "list.bullet")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 340, height: 24,
-                                   alignment: .trailing)
-                            .foregroundColor(.white)
+                            Image(systemName: "person.badge.plus")
+                                .imageScale(.large)
+                        }
                     }
                 }
             }
@@ -95,7 +91,6 @@ struct PlayerInfoText: View {
     
     var body: some View {
         Text(text)
-            .foregroundColor(.white)
             .font(.system(size: 34, weight: .regular))
             .padding(.top, 20)
     }

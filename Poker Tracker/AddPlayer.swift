@@ -28,9 +28,12 @@ struct AddPlayer:View {
             }
             .navigationTitle("Add Player")
             .toolbar {
-                Button("Done") {
-                    observedPlayersList.players.append(Player(name: name, money: startingMoney))
+                Button {
+                    name != "" ? observedPlayersList.players.append(Player(name: name, money: startingMoney)) : dismiss()
                     dismiss()
+                } label: {
+                    Text("Done")
+                        .fontWeight(.bold)
                 }
             }
         }
