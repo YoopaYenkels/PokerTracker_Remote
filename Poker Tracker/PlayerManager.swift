@@ -80,12 +80,12 @@ class PlayersList: ObservableObject {
         Player(name: "Bob", money: 15),
         Player(name: "Charlie", money: 15),
         Player(name: "David", money: 15),
-        Player(name: "Elizabeth", money: 15),
-        Player(name: "Fred", money: 15),
-        Player(name: "Gwen", money: 15),
-        Player(name: "Holly", money: 15),
-        Player(name: "Iola", money: 15),
-        Player(name: "Jeff", money: 15)
+//        Player(name: "Elizabeth", money: 15),
+//        Player(name: "Fred", money: 15),
+//        Player(name: "Gwen", money: 15),
+//        Player(name: "Holly", money: 15),
+//        Player(name: "Iola", money: 15),
+//        Player(name: "Jeff", money: 15)
         
     ]
     
