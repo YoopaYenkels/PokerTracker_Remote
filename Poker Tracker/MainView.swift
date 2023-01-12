@@ -11,17 +11,17 @@ enum GameState {
     case blinds, preflop, flop, turn, river
 }
 
-enum PlayerRole {
-    case Dealer, SmallBlind, BigBlind
+enum PlayerRole : Int {
+    case None, Dealer, SmallBlind, BigBlind
 }
 
 struct MainView: View {
     @StateObject var playersList: PlayersList = PlayersList()
     
     @State var whoseTurn: Int = 0
-    @State var whoIsDealer: Int = 0
+    @State var whoIsDealer: Int = 4
     
-    @State var potAmount = 0
+    //@State var potAmount = 0
 
     var body: some View {
             NavigationStack {
@@ -41,7 +41,10 @@ struct MainView: View {
                                         player: player,
                                         whoIsDealer: $whoIsDealer,
                                         playerIndex: index,
-                                        isDealer: $playersList.players[index].isDealer
+                                        myRole:
+                                            playersList.players[index].myRole,
+                                        isDealer: playersList.players[index].isDealer
+                                        
                                     )
                                 }
                             }
@@ -96,26 +99,53 @@ struct ActionButton: View {
 
 struct PlayerHomeScreenRowView: View {
     var player: Player
-
+    
     @Binding var whoIsDealer: Int
     var playerIndex: Int
+    
+    @State var myRole: PlayerRole
+    @State var isDealer: Bool
 
-    @Binding var isDealer: Bool
+    func GetRole() -> PlayerRole {
+        switch (playerIndex - whoIsDealer) {
+        case(1):
+            return .Dealer
+        case(2):
+            return .SmallBlind
+        case(3):
+            return .BigBlind
+        default:
+            return .None
+        }
+    }
     
     var body: some View {
         HStack {
-            Label(player.name, systemImage: isDealer ? "crown.fill" : "")
-                //.font(.system(size: 24, weight: .regular))
-               // .foregroundColor(isDealer ? .red : .black)
+            switch (myRole) {
+            case .None:
+                Label(player.name, systemImage: "")
+            case .Dealer:
+                Label(player.name + " (Dealer)", systemImage: "crown.fill")
+                    .foregroundColor(.green)
+            case .SmallBlind:
+                Label {Text(player.name)} icon: {
+                    Image(systemName: "eye.slash.fill")
+                        .imageScale(.small)
+                        .foregroundColor(.black)
+                }
+            case .BigBlind:
+                Label(player.name, systemImage: "eye.slash.fill")
+                    .foregroundColor(.black)
+            }
             Spacer()
             Label("\(player.money)", systemImage: "dollarsign.circle")
                 .foregroundColor(.secondary)
         }
         .padding(.horizontal, 30)
         .onAppear(perform: {
-            isDealer = (playerIndex == whoIsDealer)
+            myRole = GetRole()
         })
-       
+        
     }
 }
 

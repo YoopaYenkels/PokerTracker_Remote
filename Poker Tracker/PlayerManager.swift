@@ -69,9 +69,8 @@ struct Player: Identifiable {
     var money: Int = 0
     
     var isDealer: Bool = false
-//    var isSmallBlind: Bool = false
-//    var isBigBlind: Bool = false
-//
+    var myRole: PlayerRole = PlayerRole.None
+ 
 //    var isMyTurn: Bool = false
 }
 
