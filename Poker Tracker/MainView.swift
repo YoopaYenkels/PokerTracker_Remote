@@ -7,18 +7,27 @@
 
 import SwiftUI
 
+enum GameState {
+    case blinds, preflop, flop, turn, river
+}
+
+enum PlayerRole {
+    case Dealer, SmallBlind, BigBlind
+}
+
 struct MainView: View {
-    
     @StateObject var playersList: PlayersList = PlayersList()
+    
+    @State var whoseTurn: Int = 0
+    @State var whoIsDealer: Int = 0
+    
     @State var potAmount = 0
-    
-    
+
     var body: some View {
             NavigationStack {
                ZStack {
                     //Color("bgColor1").ignoresSafeArea(.all)
                     VStack {
-         
                         PotView()
                         
                         if playersList.players.isEmpty {
@@ -27,8 +36,13 @@ struct MainView: View {
                                 .padding(.top, 30)
                         } else {
                             List {
-                                ForEach(playersList.players) {player in
-                                    PlayerHomeScreenView(player: player)
+                                ForEach(Array(zip(playersList.players.indices, playersList.players)), id: \.0) { index, player in
+                                    PlayerHomeScreenRowView(
+                                        player: player,
+                                        whoIsDealer: $whoIsDealer,
+                                        playerIndex: index,
+                                        isDealer: $playersList.players[index].isDealer
+                                    )
                                 }
                             }
                             .background(.white)
@@ -36,6 +50,13 @@ struct MainView: View {
                         }
                         
                         Spacer()
+                        
+                        Button {
+                            // start round
+                        } label: {
+                            Text("Start New Round")
+                                .font(.system(size: 30, weight: .bold))                   
+                        }.buttonStyle(.borderedProminent)
                     }
                }
                 .navigationTitle("Poker Tracker")
@@ -73,17 +94,28 @@ struct ActionButton: View {
     }
 }
 
-struct PlayerHomeScreenView: View {
+struct PlayerHomeScreenRowView: View {
     var player: Player
+
+    @Binding var whoIsDealer: Int
+    var playerIndex: Int
+
+    @Binding var isDealer: Bool
     
     var body: some View {
         HStack {
-            Text(player.name)
-                .font(.system(size: 24, weight: .regular))
-
+            Label(player.name, systemImage: isDealer ? "crown.fill" : "")
+                //.font(.system(size: 24, weight: .regular))
+               // .foregroundColor(isDealer ? .red : .black)
             Spacer()
             Label("\(player.money)", systemImage: "dollarsign.circle")
-        }.padding(.horizontal, 30)
+                .foregroundColor(.secondary)
+        }
+        .padding(.horizontal, 30)
+        .onAppear(perform: {
+            isDealer = (playerIndex == whoIsDealer)
+        })
+       
     }
 }
 

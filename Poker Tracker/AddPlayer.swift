@@ -12,7 +12,7 @@ struct AddPlayer:View {
     @Environment(\.dismiss) var dismiss
     
     @State private var name = ""
-    @State private var startingMoney = 250
+    @State private var startingMoney = 15
     
     @ObservedObject var observedPlayersList: PlayersList
     
@@ -20,7 +20,7 @@ struct AddPlayer:View {
         NavigationView {
             Form {
                 TextField("Enter Name", text: $name)
-                Stepper(value: $startingMoney, in: 1...500) {
+                Stepper(value: $startingMoney, in: 1...50) {
                     VStack {
                         Text("Starting Money")
                         Label("\(startingMoney)", systemImage: "dollarsign.circle")

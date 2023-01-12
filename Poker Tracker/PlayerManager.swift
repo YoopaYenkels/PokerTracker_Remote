@@ -22,6 +22,7 @@ struct PlayerManager: View {
                         PlayerRowView(player: player)
                     }
                     .onDelete(perform: observedPlayersList.deletePlayer)
+                    
                 }
 
                 HStack {
@@ -46,9 +47,11 @@ struct PlayerManager: View {
         .navigationBarTitle("Manage Players")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing){
+            ToolbarItemGroup(placement: .navigationBarTrailing){
+                EditButton()
                 Button {
                     observedPlayersList.deleteAllPlayers()
+                
                 } label: {
                     Image(systemName: "trash")
                         .imageScale(.large)
@@ -62,12 +65,30 @@ struct PlayerManager: View {
 
 struct Player: Identifiable {
     var id = UUID()
-    var name: String
-    var money: Int
+    var name: String = ""
+    var money: Int = 0
+    
+    var isDealer: Bool = false
+//    var isSmallBlind: Bool = false
+//    var isBigBlind: Bool = false
+//
+//    var isMyTurn: Bool = false
 }
 
 class PlayersList: ObservableObject {
-    @Published var players: [Player] = []
+    @Published var players: [Player] = [
+        Player(name: "Alice", money: 15),
+        Player(name: "Bob", money: 15),
+        Player(name: "Charlie", money: 15),
+        Player(name: "David", money: 15),
+        Player(name: "Elizabeth", money: 15),
+        Player(name: "Fred", money: 15),
+        Player(name: "Gwen", money: 15),
+        Player(name: "Holly", money: 15),
+        Player(name: "Iola", money: 15),
+        Player(name: "Jeff", money: 15)
+        
+    ]
     
     func deletePlayer(index: IndexSet) {
         players.remove(atOffsets: index)
@@ -91,6 +112,7 @@ struct PlayerRowView: View {
                 .foregroundColor(.secondary)
                 .font(.system(size: 24, weight: .light))
         }.frame(height: 20)
+        
     }
 }
 
