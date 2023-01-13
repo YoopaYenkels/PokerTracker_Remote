@@ -14,17 +14,16 @@ struct PlayersView: View {
     
     var body:some View {
         if playersList.players.isEmpty {
-            Text("(No Players)")
-                .font(.system(size: 30, weight: .regular))
-                .padding(.top, 30)
+            Text("Add at least two players to begin")
+                .font(.system(size: 16, weight: .regular))
         } else {
             List {
                 ForEach(playersList.players) { player in
                     PlayerHomeScreenRowView(player: player)
                 }
             }
-            .background(.white)
             .scrollContentBackground(.hidden)
+            .background(.white)
         }
     }
 }
@@ -37,6 +36,11 @@ struct PlayerHomeScreenRowView: View {
     
     var body: some View {
         HStack {
+            if (player.myTurn && gameInfo.gameState != .blinds) {
+                Image(systemName: "arrow.right")
+                    .foregroundColor(.red)
+            }
+            
             switch (player.myRole) {
             case .None:
                 Label(player.name, systemImage: "")
@@ -53,9 +57,20 @@ struct PlayerHomeScreenRowView: View {
                 Label(player.name, systemImage: "eye.slash.fill")
                     .foregroundColor(.black)
             }
+        
             Spacer()
-            Label("\(player.money)", systemImage: "dollarsign.circle")
-                .foregroundColor(.secondary)
+            
+            HStack {
+                Image(systemName: "arrow.up.circle")
+                Text("\(player.spentThisRound)")
+            }
+            .padding(.trailing, 10)
+            
+            HStack {
+                Image(systemName: "dollarsign.circle")
+                Text("\(player.money)")
+            }
+            .foregroundColor(.secondary)
         }
     }
 }

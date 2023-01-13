@@ -13,10 +13,6 @@ struct PotView: View {
     
     var body: some View {
         VStack {
-            Divider()
-                .frame(width: 300, height: 4)
-                .overlay(.black)
-              
             HStack (spacing: 20){
                 Image(systemName: "suit.club.fill")
                     .resizable()
@@ -48,7 +44,8 @@ struct PotView: View {
             
             Text("Pot")
                 .font(.system(size: 40, weight: .regular))
-
+           
+            
             Text("$\(gameInfo.potAmount)")
                 .font(.system(size: 40, weight: .light))
             
@@ -56,6 +53,6 @@ struct PotView: View {
                 .frame(width: 300, height: 4)
                 .overlay(.black)
          
-        }.padding(.top, 50)
+        }
     }
 }

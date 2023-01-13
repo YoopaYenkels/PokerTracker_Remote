@@ -10,7 +10,8 @@ import SwiftUI
 
 struct PlayerManager: View {
     @State private var showAddPlayer = false
-
+    @State private var showDeleteAllConfirmation = false
+    
     @EnvironmentObject var playersList: PlayersList
     
     var body: some View {
@@ -39,6 +40,8 @@ struct PlayerManager: View {
                             .presentationDetents([.medium])
                     }
                 }
+                .scrollContentBackground(.hidden)
+                .background(.white)
             }
         }
         .navigationBarTitle("Manage Players")
@@ -46,13 +49,17 @@ struct PlayerManager: View {
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing){
                 EditButton()
-                Button {
-                    playersList.deleteAllPlayers()
-                
+                Button (role: .destructive) {
+                    showDeleteAllConfirmation = true
                 } label: {
                     Image(systemName: "trash")
                         .imageScale(.large)
                 }
+                .confirmationDialog("Confirm Delete", isPresented: $showDeleteAllConfirmation) {
+                    Button ("Delete All Players", role: .destructive) {
+                        playersList.deleteAllPlayers()
+                    }
+                } 
             }
         }
     }
@@ -61,25 +68,27 @@ struct PlayerManager: View {
 struct Player: Identifiable {
     var id = UUID()
     var name: String = ""
-    var money: Int = 0
+    
+    var money: Int = 15
+    var spentThisRound: Int = 0
     
     var myRole: PlayerRole = PlayerRole.None
-//    var isMyTurn: Bool = false
+    var myTurn: Bool = false
+    var hasFolded: Bool = false
 }
 
 class PlayersList: ObservableObject {
     @Published var players: [Player] = [
-        Player(name: "Alice", money: 15),
-        Player(name: "Bob", money: 15),
-        Player(name: "Chaz", money: 15),
-        Player(name: "Dave", money: 15),
-        Player(name: "Emma", money: 15),
-        Player(name: "Fred", money: 15),
-        Player(name: "Gwen", money: 15),
-        Player(name: "Hera", money: 15)
-//        Player(name: "Iola", money: 15),
-//        Player(name: "Jeff", money: 15)
-
+        Player(name: "Alice"),
+        Player(name: "Bob"),
+        Player(name: "Chaz"),
+        Player(name: "Dave"),
+        Player(name: "Emma"),
+        Player(name: "Fred"),
+        Player(name: "Gwen"),
+        Player(name: "Hera"),
+        //        Player(name: "Iola"),
+        //        Player(name: "Jeff")
     ]
     
     func deletePlayer(index: IndexSet) {
@@ -101,7 +110,7 @@ struct PlayerRowView: View {
             
             Spacer()
             
-            Label("\(player.money)", systemImage: "dollarsign.circle")  
+            Label("\(player.money)", systemImage: "dollarsign.circle")
                 .foregroundColor(.secondary)
                 .font(.system(size: 24, weight: .light))
         }.frame(height: 20)
