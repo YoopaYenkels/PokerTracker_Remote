@@ -14,7 +14,7 @@ struct AddPlayer:View {
     @State private var name = ""
     @State private var startingMoney = 15
     
-    @ObservedObject var observedPlayersList: PlayersList
+    @EnvironmentObject var playersList: PlayersList
     
     var body: some View {
         NavigationView {
@@ -32,7 +32,7 @@ struct AddPlayer:View {
             .toolbar {
                 Button {
                     name != "" ?
-                    observedPlayersList.players
+                    playersList.players
                         .append(Player(name: name, money: startingMoney)) : dismiss()
                     dismiss()
                 } label: {

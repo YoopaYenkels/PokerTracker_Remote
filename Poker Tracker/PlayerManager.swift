@@ -8,40 +8,37 @@
 import Foundation
 import SwiftUI
 
-// this view creates and owns the players list object
 struct PlayerManager: View {
     @State private var showAddPlayer = false
 
-    @ObservedObject var observedPlayersList: PlayersList
+    @EnvironmentObject var playersList: PlayersList
     
     var body: some View {
         NavigationStack {
             VStack {
                 List {
-                    ForEach(observedPlayersList.players) {player in
+                    ForEach(playersList.players) {player in
                         PlayerRowView(player: player)
                     }
-                    .onDelete(perform: observedPlayersList.deletePlayer)
+                    .onDelete(perform: playersList.deletePlayer)
                     
-                }
-
-                HStack {
                     Button {
                         showAddPlayer.toggle()
                     } label: {
-                        Image(systemName: "plus.circle.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 26, height: 26, alignment: .leading)
-                        Text("Add Player")
-                            .font(.system(size: 20, weight: .regular))
-                            .foregroundColor(.blue)
+                        HStack {
+                            Image(systemName: "plus.circle")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 16, alignment: .leading)
+                            Text("Add Player")
+                                .font(.system(size: 20, weight: .regular))
+                                .foregroundColor(.blue)
+                        }
                     }.sheet(isPresented: $showAddPlayer) {
-                        AddPlayer(observedPlayersList: observedPlayersList)
-                            .presentationDetents([.medium])
+                        AddPlayer()
+                            .presentationDetents([.medium, .large])
                     }
-
-                }.padding()
+                }
             }
         }
         .navigationBarTitle("Manage Players")
@@ -50,7 +47,7 @@ struct PlayerManager: View {
             ToolbarItemGroup(placement: .navigationBarTrailing){
                 EditButton()
                 Button {
-                    observedPlayersList.deleteAllPlayers()
+                    playersList.deleteAllPlayers()
                 
                 } label: {
                     Image(systemName: "trash")
@@ -58,9 +55,7 @@ struct PlayerManager: View {
                 }
             }
         }
-        
     }
-    
 }
 
 struct Player: Identifiable {
@@ -68,9 +63,7 @@ struct Player: Identifiable {
     var name: String = ""
     var money: Int = 0
     
-    var isDealer: Bool = false
     var myRole: PlayerRole = PlayerRole.None
- 
 //    var isMyTurn: Bool = false
 }
 
@@ -80,13 +73,13 @@ class PlayersList: ObservableObject {
         Player(name: "Bob", money: 15),
         Player(name: "Charlie", money: 15),
         Player(name: "David", money: 15),
-//        Player(name: "Elizabeth", money: 15),
-//        Player(name: "Fred", money: 15),
-//        Player(name: "Gwen", money: 15),
+        Player(name: "Elizabeth", money: 15),
+        Player(name: "Fred", money: 15),
+        Player(name: "Gwen", money: 15),
 //        Player(name: "Holly", money: 15),
 //        Player(name: "Iola", money: 15),
 //        Player(name: "Jeff", money: 15)
-        
+
     ]
     
     func deletePlayer(index: IndexSet) {

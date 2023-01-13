@@ -15,47 +15,76 @@ enum PlayerRole : Int {
     case Dealer, SmallBlind, BigBlind, None
 }
 
+class GameInfo: ObservableObject {
+    @Published var whoIsDealer = 0
+//    @Published var whoseTurn: Int = 0
+//    @Published var gameState: GameState = .preflop
+//    @Published var potAmount = 0
+}
+
 struct MainView: View {
-    @StateObject var playersList: PlayersList = PlayersList()
+    @EnvironmentObject var playersList: PlayersList
+    @EnvironmentObject var gameInfo: GameInfo
+
+    func UpdateDealer() {
+        if ((gameInfo.whoIsDealer + 2) > playersList.players.count) {
+            gameInfo.whoIsDealer = 0;
+        } else {
+            gameInfo.whoIsDealer += 1
+        }
+       ApplyRoles()
+    }
     
-    @State var whoseTurn: Int = 0
-    @State var whoIsDealer: Int = 0
-    
-    @State var gameState: GameState = .preflop
-    
-    @State var potAmount = 0
-    
+    func ApplyRoles() {
+        for i in 0...(playersList.players.count - 1) {
+            switch (i - gameInfo.whoIsDealer) {
+            case (0): playersList.players[i].myRole = .Dealer
+            case (1): playersList.players[i].myRole = .SmallBlind
+            case (2): playersList.players[i].myRole = .BigBlind
+            default: playersList.players[i].myRole = .None
+            }
+            
+            if (gameInfo.whoIsDealer == (playersList.players.count - 1)) {
+                if (i == 0) {
+                    playersList.players[i].myRole = .SmallBlind
+                } else if (i == 1) {
+                    playersList.players[i].myRole = .BigBlind
+                }
+            } else if (gameInfo.whoIsDealer == (playersList.players.count - 2)) {
+                if (i == 0) {
+                    playersList.players[i].myRole = .BigBlind
+                }
+            }       
+        }
+    }
+
     var body: some View {
         NavigationStack {
+           
             ZStack {
-                //Color("bgColor1").ignoresSafeArea(.all)
+                Color(.white).ignoresSafeArea()
                 VStack {
                     PotView()
-                    
-                    PlayersView(whoIsDealer: $whoIsDealer,
-                                playersList: playersList)
-                    
+                    PlayersView()
                     Spacer()
-                    
-                    Button {} label: {
-                        Text("New Round")
-                            .font(.system(size: 30, weight: .bold))
-                    }.buttonStyle(.bordered)
+                    Button ("New Round", action: UpdateDealer)
+                        .buttonStyle(.borderedProminent)
                 }
-            }
-            .navigationTitle("Poker Tracker")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading){
-                    NavigationLink (destination: PlayerManager(observedPlayersList: playersList)) {                 
-                        Image(systemName: "person.badge.plus")
+                .navigationTitle("Poker Tracker")
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading){
+                        NavigationLink (destination: PlayerManager()) {
+                            Image(systemName: "person.badge.plus")
+                                .imageScale(.large)
+                        }
+                    }
+                    
+                    ToolbarItem(placement: .navigationBarTrailing){
+                        Image(systemName: "gear")
                             .imageScale(.large)
                     }
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing){
-                    Image(systemName: "gear")
-                        .imageScale(.large)
-                }
+                .onAppear(perform: ApplyRoles)
             }
         }
     }
@@ -64,33 +93,7 @@ struct MainView: View {
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
         MainView()
+            .environmentObject(GameInfo())
+            .environmentObject(PlayersList())
     }
 }
-
-//struct ActionButton: View {
-//    var text: String
-//
-//    var body: some View {
-//        Button(text , action: {})
-//            .foregroundColor(.white)
-//            .frame(width: 100, height: 50)
-//    }
-//}
-//struct ActionsView: View {
-//    var body: some View {
-//        HStack (spacing: 20) {
-//            ActionButton(text: "Call")
-//                .font(.system(size: 30, weight: .bold))
-//                .background(Color("bgColor1"))
-//                .cornerRadius(10)
-//            ActionButton(text: "Raise")
-//                .font(.system(size: 30, weight: .bold))
-//                .background(.blue)
-//                .cornerRadius(10)
-//            ActionButton(text: "Fold")
-//                .font(.system(size: 30, weight: .bold))
-//                .background(.red)
-//                .cornerRadius(10)
-//        }.padding()
-//    }
-//}
