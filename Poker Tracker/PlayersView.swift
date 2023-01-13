@@ -19,11 +19,8 @@ struct PlayersView: View {
                 .padding(.top, 30)
         } else {
             List {
-                ForEach(Array(zip(playersList.players.indices, playersList.players)), id: \.0) { index, player in
-                    PlayerHomeScreenRowView(
-                        player: player,
-                        playerIndex: index
-                    )
+                ForEach(playersList.players) { player in
+                    PlayerHomeScreenRowView(player: player)
                 }
             }
             .background(.white)
@@ -34,14 +31,13 @@ struct PlayersView: View {
 
 struct PlayerHomeScreenRowView: View {
     var player: Player
-    var playerIndex: Int
     
     @EnvironmentObject var playersList: PlayersList
     @EnvironmentObject var gameInfo: GameInfo
     
     var body: some View {
         HStack {
-            switch (playersList.players[playerIndex].myRole) {
+            switch (player.myRole) {
             case .None:
                 Label(player.name, systemImage: "")
             case .Dealer:

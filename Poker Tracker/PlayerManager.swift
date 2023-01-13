@@ -26,7 +26,7 @@ struct PlayerManager: View {
                         showAddPlayer.toggle()
                     } label: {
                         HStack {
-                            Image(systemName: "plus.circle")
+                            Image(systemName: "plus")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 16, height: 16, alignment: .leading)
@@ -36,7 +36,7 @@ struct PlayerManager: View {
                         }
                     }.sheet(isPresented: $showAddPlayer) {
                         AddPlayer()
-                            .presentationDetents([.medium, .large])
+                            .presentationDetents([.medium])
                     }
                 }
             }
@@ -71,12 +71,12 @@ class PlayersList: ObservableObject {
     @Published var players: [Player] = [
         Player(name: "Alice", money: 15),
         Player(name: "Bob", money: 15),
-        Player(name: "Charlie", money: 15),
-        Player(name: "David", money: 15),
-        Player(name: "Elizabeth", money: 15),
+        Player(name: "Chaz", money: 15),
+        Player(name: "Dave", money: 15),
+        Player(name: "Emma", money: 15),
         Player(name: "Fred", money: 15),
         Player(name: "Gwen", money: 15),
-//        Player(name: "Holly", money: 15),
+        Player(name: "Hera", money: 15)
 //        Player(name: "Iola", money: 15),
 //        Player(name: "Jeff", money: 15)
 
@@ -84,6 +84,7 @@ class PlayersList: ObservableObject {
     
     func deletePlayer(index: IndexSet) {
         players.remove(atOffsets: index)
+        print("Player no.: \(players.count)")
     }
     
     func deleteAllPlayers() {

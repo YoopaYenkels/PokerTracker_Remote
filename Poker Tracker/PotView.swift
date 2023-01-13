@@ -9,6 +9,8 @@ import Foundation
 import SwiftUI
 
 struct PotView: View {
+    @EnvironmentObject var gameInfo: GameInfo
+    
     var body: some View {
         VStack {
             Divider()
@@ -47,7 +49,7 @@ struct PotView: View {
             Text("Pot")
                 .font(.system(size: 40, weight: .regular))
 
-            Text("$0")
+            Text("$\(gameInfo.potAmount)")
                 .font(.system(size: 40, weight: .light))
             
             Divider()
