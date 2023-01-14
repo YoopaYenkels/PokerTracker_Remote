@@ -36,7 +36,7 @@ struct PlayerHomeScreenRowView: View {
     
     var body: some View {
         HStack {
-            if (player.myTurn && gameInfo.gameState != .blinds) {
+            if (player.myTurn && gameInfo.betState != .blinds) {
                 Image(systemName: "arrow.right")
                     .foregroundColor(.red)
             }

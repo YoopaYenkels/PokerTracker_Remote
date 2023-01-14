@@ -13,31 +13,37 @@ struct BottomBarView:View {
     @EnvironmentObject var gameInfo: GameInfo
     
     @State private var showActions = false
+    @State private var showRaise = false
+    @State private var amountRaised = 0
     
     var AddBlinds: () -> Void
     var NewRound: () -> Void
     var UpdateTurn: () -> Void
     var ApplyRoles: () -> Void
+    var NewBettingRound: () -> Void
     
     var body: some View {
         if (playersList.players.count > 1) {
             VStack {
-                if (gameInfo.gameState == .blinds) {
+                if (gameInfo.betState == .blinds) {
                     Button ("Begin Hand", action: self.AddBlinds)
                         .buttonStyle(.borderedProminent)
-                } else if (gameInfo.gameState == .preflop) {
-                    Button {
-                        showActions.toggle()
-                    } label: {
-                        Text("\(playersList.players[gameInfo.whoseTurn].name)'s Turn")
-                            .font(.system(size: 30, weight: .regular))
-                            .foregroundColor(.blue)
-                    }
-                    .buttonStyle(.bordered)
-                    .sheet(isPresented: $showActions) {
-                        ActionsView(UpdateTurn: UpdateTurn,
-                        ApplyRoles: ApplyRoles)
-                            .presentationDetents([.medium])
+                } else if (!gameInfo.betsEqualized ||
+                        (gameInfo.betsEqualized && playersList.players[gameInfo.whoseTurn].myRole == PlayerRole.BigBlind)) {
+                        Button {
+                            showActions.toggle()
+                        } label: {
+                            Text("\(playersList.players[gameInfo.whoseTurn].name)'s Turn")
+                        }
+                        .buttonStyle(.bordered)
+                        .sheet(isPresented: $showActions) {
+                            ActionsView(showRaise: $showRaise,
+                                        amountRaised: $amountRaised,
+                                        UpdateTurn: UpdateTurn,
+                                        ApplyRoles: ApplyRoles,
+                                        NewBettingRound: NewBettingRound)
+                                .presentationDetents([.medium])
+                        }.onDisappear(perform: {amountRaised = gameInfo.minBet})
                     }
                 }
             }
@@ -45,8 +51,6 @@ struct BottomBarView:View {
         
     }
     
-}
-
 struct ActionButton: View {
     var text: String
 

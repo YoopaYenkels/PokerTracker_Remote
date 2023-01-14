@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-enum GameState : String {
-    case blinds, preflop, flop, turn, river
+enum BetState : String {
+    case blinds, preflop, regular
 }
 
 enum PlayerRole : Int {
@@ -27,7 +27,7 @@ class GameInfo: ObservableObject {
     //highest bet in this betting round
     var highestBet = 0
     
-    @Published var gameState: GameState = .blinds
+    @Published var betState: BetState = .blinds
     var betsEqualized: Bool = false
     
 }
@@ -49,6 +49,22 @@ struct MainView: View {
             gameInfo.whoIsDealer = 0;
         } else {
             gameInfo.whoIsDealer += 1
+        }
+    }
+    
+    func NewBettingRound() {
+        if (gameInfo.betState == .preflop) {gameInfo.betState = .regular}
+        
+        gameInfo.highestBet = 0
+        
+        if (gameInfo.whoIsDealer + 2 > playersList.players.count) {
+            gameInfo.whoseTurn = 0
+        } else {
+            gameInfo.whoseTurn = gameInfo.whoIsDealer + 1
+        }
+        
+        for i in 0...(playersList.players.count - 1) {
+            playersList.players[i].spentThisRound = 0
         }
     }
     
@@ -80,10 +96,11 @@ struct MainView: View {
         }
     }
     
-    func NewRound() {
+    func NewHand() {
         // must first give pot amount to winning player, then set to 0
         gameInfo.potAmount = 0
-        gameInfo.gameState = .blinds
+        gameInfo.betState = .blinds
+        gameInfo.betsEqualized = false
         
         if (playersList.players.count > 1) {
             for i in 0...(playersList.players.count - 1) {
@@ -114,7 +131,7 @@ struct MainView: View {
             }
         }
         
-        gameInfo.gameState = .preflop
+        gameInfo.betState = .preflop
         gameInfo.highestBet = gameInfo.minBet
     }
     
@@ -124,7 +141,7 @@ struct MainView: View {
                 Color(.white).ignoresSafeArea()
                 VStack {
                     VStack (alignment: .leading) {
-                        Text("Round: \(gameInfo.gameState.rawValue)")
+                        Text("Bet State: \(gameInfo.betState.rawValue)")
                         Text("Min Bet: \(gameInfo.minBet)")
                         Text("Highest Bet: \(gameInfo.highestBet)")
                         Text("Bets Equalized: \(String(gameInfo.betsEqualized))")
@@ -134,9 +151,10 @@ struct MainView: View {
                         .padding(.top, 30)
                     PlayersView()
                     BottomBarView(AddBlinds: self.AddBlinds,
-                                  NewRound: self.NewRound,
+                                  NewRound: self.NewHand,
                                   UpdateTurn: self.UpdateTurn,
-                                  ApplyRoles: self.ApplyRoles)
+                                  ApplyRoles: self.ApplyRoles,
+                                  NewBettingRound: self.NewBettingRound)
                 }
                 .navigationTitle("Poker Tracker")
                 .toolbar {
@@ -149,7 +167,7 @@ struct MainView: View {
                     
                     ToolbarItem(placement: .navigationBarTrailing){
                         Button {
-                            NewRound()
+                            NewHand()
                         } label:{
                             Image(systemName: "digitalcrown.horizontal.arrow.counterclockwise")
                         }
