@@ -82,18 +82,17 @@ class PlayersList: ObservableObject {
         Player(name: "Alice"),
         Player(name: "Bob"),
         Player(name: "Chaz"),
-        Player(name: "Dave"),
-        Player(name: "Emma"),
-        Player(name: "Fred"),
-        Player(name: "Gwen"),
-        Player(name: "Hera"),
-        //        Player(name: "Iola"),
-        //        Player(name: "Jeff")
+        Player(name: "Dave")
+//        Player(name: "Emma"),
+//        Player(name: "Fred"),
+//        Player(name: "Gwen"),
+//        Player(name: "Hera"),
+//        Player(name: "Iola"),
+//        Player(name: "Jeff")
     ]
     
     func deletePlayer(index: IndexSet) {
         players.remove(atOffsets: index)
-        print("Player no.: \(players.count)")
     }
     
     func deleteAllPlayers() {

@@ -12,33 +12,37 @@ struct BottomBarView:View {
     @EnvironmentObject var playersList: PlayersList
     @EnvironmentObject var gameInfo: GameInfo
     
+    @State private var showActions = false
+    
     var AddBlinds: () -> Void
     var NewRound: () -> Void
+    var UpdateTurn: () -> Void
+    var ApplyRoles: () -> Void
     
     var body: some View {
         if (playersList.players.count > 1) {
             VStack {
                 if (gameInfo.gameState == .blinds) {
-                    Button ("Begin Round", action: self.AddBlinds)
+                    Button ("Begin Hand", action: self.AddBlinds)
                         .buttonStyle(.borderedProminent)
                 } else if (gameInfo.gameState == .preflop) {
-                    HStack (spacing: 20) {
-                        ActionButton(text: "Call")
-                            .font(.system(size: 30, weight: .bold))
-                            .background(Color("bgColor1"))
-                            .cornerRadius(10)
-                        ActionButton(text: "Raise")
-                            .font(.system(size: 30, weight: .bold))
-                            .background(.blue)
-                            .cornerRadius(10)
-                        ActionButton(text: "Fold")
-                            .font(.system(size: 30, weight: .bold))
-                            .background(.red)
-                            .cornerRadius(10)
-                    }.padding()
+                    Button {
+                        showActions.toggle()
+                    } label: {
+                        Text("\(playersList.players[gameInfo.whoseTurn].name)'s Turn")
+                            .font(.system(size: 30, weight: .regular))
+                            .foregroundColor(.blue)
+                    }
+                    .buttonStyle(.bordered)
+                    .sheet(isPresented: $showActions) {
+                        ActionsView(UpdateTurn: UpdateTurn,
+                        ApplyRoles: ApplyRoles)
+                            .presentationDetents([.medium])
+                    }
                 }
             }
         }
+        
     }
     
 }

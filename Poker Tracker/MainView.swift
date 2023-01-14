@@ -24,7 +24,11 @@ class GameInfo: ObservableObject {
     // change in settings
     @State var minBet = 2
     
+    //highest bet in this betting round
+    var highestBet = 0
+    
     @Published var gameState: GameState = .blinds
+    var betsEqualized: Bool = false
     
 }
 
@@ -71,7 +75,6 @@ struct MainView: View {
                 }
                 
                 playersList.players[i].myTurn = (i == gameInfo.whoseTurn)
-
             }
             
         }
@@ -87,7 +90,7 @@ struct MainView: View {
                 playersList.players[i].spentThisRound = 0
             }
         }
-                
+        
         UpdateDealer()
         UpdateTurn()
         
@@ -112,6 +115,7 @@ struct MainView: View {
         }
         
         gameInfo.gameState = .preflop
+        gameInfo.highestBet = gameInfo.minBet
     }
     
     var body: some View {
@@ -119,12 +123,20 @@ struct MainView: View {
             ZStack {
                 Color(.white).ignoresSafeArea()
                 VStack {
-                    Text("\(gameInfo.gameState.rawValue)")
+                    VStack (alignment: .leading) {
+                        Text("Round: \(gameInfo.gameState.rawValue)")
+                        Text("Min Bet: \(gameInfo.minBet)")
+                        Text("Highest Bet: \(gameInfo.highestBet)")
+                        Text("Bets Equalized: \(String(gameInfo.betsEqualized))")
+                        Text("Whose Turn: \(playersList.players[gameInfo.whoseTurn].name)")
+                    }
                     PotView()
-                        .padding(.top, 30)            
+                        .padding(.top, 30)
                     PlayersView()
                     BottomBarView(AddBlinds: self.AddBlinds,
-                                NewRound: self.NewRound)
+                                  NewRound: self.NewRound,
+                                  UpdateTurn: self.UpdateTurn,
+                                  ApplyRoles: self.ApplyRoles)
                 }
                 .navigationTitle("Poker Tracker")
                 .toolbar {
