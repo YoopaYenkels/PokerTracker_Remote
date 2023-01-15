@@ -20,7 +20,8 @@ struct PlayersView: View {
             List {
                 ForEach(playersList.players) { player in
                     PlayerHomeScreenRowView(player: player)
-                }
+                        .listRowBackground(player.hasFolded ? Color.gray : Color.white)
+                } 
             }
             .scrollContentBackground(.hidden)
             .background(.white)
@@ -40,6 +41,7 @@ struct PlayerHomeScreenRowView: View {
                 Image(systemName: "arrow.right")
                     .foregroundColor(.red)
             }
+            
             
             switch (player.myRole) {
             case .None:

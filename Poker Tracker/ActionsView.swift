@@ -22,11 +22,13 @@ struct ActionsView: View {
     var NewBettingRound: () -> Void
     
     func CheckEqualBets() {
-        let betAmount = playersList.players[0].spentThisRound
         gameInfo.betsEqualized = true
         
         for i in 0...(playersList.players.count - 1) {
-            if (playersList.players[i].spentThisRound != betAmount) {
+            if (!playersList.players[i].hasFolded &&
+                (playersList.players[i].spentThisRound != gameInfo.highestBet ||
+                 playersList.players[i].spentThisRound == 0 ||
+                 playersList.players[i].hasPlayed == false)) {
                 gameInfo.betsEqualized = false
                 return
             }
@@ -39,6 +41,8 @@ struct ActionsView: View {
         playersList.players[gameInfo.whoseTurn].money -= amountToCall
         playersList.players[gameInfo.whoseTurn].spentThisRound += amountToCall
         gameInfo.potAmount += amountToCall
+        
+        playersList.players[gameInfo.whoseTurn].hasPlayed = true
         
         CheckEqualBets()
         
@@ -54,21 +58,30 @@ struct ActionsView: View {
     }
     
     func Check() {
-        if (playersList.players[gameInfo.whoseTurn].myRole == PlayerRole.BigBlind && gameInfo.betsEqualized) {
+        playersList.players[gameInfo.whoseTurn].hasPlayed = true
+        gameInfo.numChecks += 1
+        
+        if ((gameInfo.betState == .preflop &&
+             playersList.players[gameInfo.whoseTurn].myRole == PlayerRole.BigBlind &&
+             gameInfo.betsEqualized) ||
+            
+            (gameInfo.betState == .regular &&
+             gameInfo.numChecks == gameInfo.numActivePlayers)) {
             NewBettingRound()
         }
         
+        UpdateTurn()
         ApplyRoles()
         dismiss()
     }
     
     func ShowRaise() {
-        if ((playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound) >= gameInfo.minBet)) {
+        if (gameInfo.minBet <= (playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound))) {
             showRaise = true
         }
         amountRaised = gameInfo.minBet
     }
-
+    
     func SubmitRaise() {
         let amountToCall = (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)
         
@@ -78,29 +91,69 @@ struct ActionsView: View {
         
         gameInfo.highestBet = playersList.players[gameInfo.whoseTurn].spentThisRound
         
+        playersList.players[gameInfo.whoseTurn].hasPlayed = true
+        
         UpdateTurn()
         ApplyRoles()
+        
+        showRaise = false
+        dismiss()
+    }
+    
+    func Fold() {
+        playersList.players[gameInfo.whoseTurn].hasPlayed = true
+        playersList.players[gameInfo.whoseTurn].hasFolded = true
+        gameInfo.numActivePlayers -= 1
+        
+        CheckEqualBets()
+        
+        if (gameInfo.betsEqualized) {
+            NewBettingRound()
+            ApplyRoles()
+            return
+        }
+        
+        UpdateTurn()
+        ApplyRoles()
+        dismiss()
     }
     
     var body: some View {
         NavigationView {
-            VStack (spacing: 60) {
+            VStack (spacing: 30) {
+                HStack {
+                    HStack {
+                        Image(systemName: "arrow.up.circle")
+                        Text("\(playersList.players[gameInfo.whoseTurn].spentThisRound)")
+                    }
+                    .padding(.trailing, 10)
+                    
+                    HStack {
+                        Image(systemName: "dollarsign.circle")
+                        Text("\(playersList.players[gameInfo.whoseTurn].money)")
+                    }
+                    .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
                 if (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound == 0) {
                     Button("Check", action: Check)
                 } else {
                     Button("Call", action: Call)
-                }         
+                }
                 
                 if (showRaise) {
+                    HStack {
+                        Text("Raise by $\(amountRaised)")
                         Stepper (value: $amountRaised,
                                  in: gameInfo.minBet...playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)) {
-                                 Text("Raising by $\(amountRaised)")
-                        }.padding(.horizontal, 60)             
-                } else {
-                    Button("Raise", action: ShowRaise)
+                        }
+                    }.padding(.horizontal, 80)
                 }
-                Button("Fold", role: .destructive, action: {})
+                Button("Fold", role: .destructive, action: Fold)
             }
+            .onAppear(perform: ShowRaise)
             .navigationTitle("\(playersList.players[gameInfo.whoseTurn].name)'s Actions")
             .toolbar {
                 ToolbarItem (placement: .navigationBarLeading) {
@@ -114,10 +167,8 @@ struct ActionsView: View {
                     ToolbarItem (placement: .navigationBarTrailing) {
                         Button {
                             SubmitRaise()
-                            showRaise.toggle()
-                            dismiss()
                         } label: {
-                            Text("Confirm")
+                            Text("Raise")
                                 .fontWeight(.bold)
                         }
                     }

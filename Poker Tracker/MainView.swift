@@ -29,7 +29,9 @@ class GameInfo: ObservableObject {
     
     @Published var betState: BetState = .blinds
     var betsEqualized: Bool = false
-    
+    var bettingRound: Int = 0
+    var numChecks: Int = 0
+    var numActivePlayers: Int = 0
 }
 
 struct MainView: View {
@@ -37,11 +39,24 @@ struct MainView: View {
     @EnvironmentObject var gameInfo: GameInfo
     
     func UpdateTurn() {
-        if ((gameInfo.whoseTurn + 2) > playersList.players.count) {
-            gameInfo.whoseTurn =  0
-        } else {
-            gameInfo.whoseTurn += 1
+        let upper = (playersList.players.count - 1) - gameInfo.whoseTurn
+        
+        if (gameInfo.whoseTurn < playersList.players.count - 1) {
+            for i in (1...upper) {
+                if (!playersList.players[gameInfo.whoseTurn + i].hasFolded)  {
+                    gameInfo.whoseTurn = gameInfo.whoseTurn + i
+                    return
+                }
+            }
         }
+        
+        for i in (0...playersList.players.count) {
+            if (!playersList.players[i].hasFolded)  {
+                gameInfo.whoseTurn = i
+                return
+            }
+        }
+
     }
     
     func UpdateDealer() {
@@ -55,7 +70,10 @@ struct MainView: View {
     func NewBettingRound() {
         if (gameInfo.betState == .preflop) {gameInfo.betState = .regular}
         
+        gameInfo.bettingRound += 1
+        gameInfo.numChecks = 0
         gameInfo.highestBet = 0
+        gameInfo.betsEqualized = false
         
         if (gameInfo.whoIsDealer + 2 > playersList.players.count) {
             gameInfo.whoseTurn = 0
@@ -65,6 +83,10 @@ struct MainView: View {
         
         for i in 0...(playersList.players.count - 1) {
             playersList.players[i].spentThisRound = 0
+            
+            if (!playersList.players[i].hasFolded) {
+                playersList.players[i].hasPlayed = false
+            }
         }
     }
     
@@ -101,10 +123,12 @@ struct MainView: View {
         gameInfo.potAmount = 0
         gameInfo.betState = .blinds
         gameInfo.betsEqualized = false
+        gameInfo.numActivePlayers = playersList.players.count
         
         if (playersList.players.count > 1) {
             for i in 0...(playersList.players.count - 1) {
                 playersList.players[i].spentThisRound = 0
+                playersList.players[i].hasFolded = false
             }
         }
         
@@ -141,17 +165,19 @@ struct MainView: View {
                 Color(.white).ignoresSafeArea()
                 VStack {
                     VStack (alignment: .leading) {
-                        Text("Bet State: \(gameInfo.betState.rawValue)")
+                        Text("Bet State: \(gameInfo.betState.rawValue) (\(gameInfo.bettingRound))")
                         Text("Min Bet: \(gameInfo.minBet)")
                         Text("Highest Bet: \(gameInfo.highestBet)")
+                        Text("Num checks: \(gameInfo.numChecks)")
                         Text("Bets Equalized: \(String(gameInfo.betsEqualized))")
                         Text("Whose Turn: \(playersList.players[gameInfo.whoseTurn].name)")
+                        Text("Active Players: \(gameInfo.numActivePlayers)")
                     }
                     PotView()
                         .padding(.top, 30)
                     PlayersView()
                     BottomBarView(AddBlinds: self.AddBlinds,
-                                  NewRound: self.NewHand,
+                                  NewHand: self.NewHand,
                                   UpdateTurn: self.UpdateTurn,
                                   ApplyRoles: self.ApplyRoles,
                                   NewBettingRound: self.NewBettingRound)

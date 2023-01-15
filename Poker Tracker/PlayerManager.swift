@@ -75,6 +75,7 @@ struct Player: Identifiable {
     var myRole: PlayerRole = PlayerRole.None
     var myTurn: Bool = false
 
+    var hasPlayed: Bool = false
     var hasFolded: Bool = false
 }
 
@@ -86,8 +87,8 @@ class PlayersList: ObservableObject {
         Player(name: "Dave")
 //        Player(name: "Emma"),
 //        Player(name: "Fred"),
-//        Player(name: "Gwen")
-//        Player(name: "Hera"),
+//        Player(name: "Gwen"),
+//        Player(name: "Hera")
 //        Player(name: "Iola"),
 //        Player(name: "Jeff")
     ]

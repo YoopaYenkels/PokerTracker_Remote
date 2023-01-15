@@ -17,7 +17,7 @@ struct BottomBarView:View {
     @State private var amountRaised = 0
     
     var AddBlinds: () -> Void
-    var NewRound: () -> Void
+    var NewHand: () -> Void
     var UpdateTurn: () -> Void
     var ApplyRoles: () -> Void
     var NewBettingRound: () -> Void
@@ -55,7 +55,7 @@ struct ActionButton: View {
     var text: String
 
     var body: some View {
-        Button(text , action: {})
+        Button(text, action: {})
             .foregroundColor(.white)
             .frame(width: 100, height: 50)
     }
