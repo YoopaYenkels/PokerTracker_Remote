@@ -18,6 +18,7 @@ enum PlayerRole : Int {
 class GameInfo: ObservableObject {
     @Published var whoIsDealer = 0
     @Published var whoseTurn: Int = 3
+    var sbPos: Int = 1
     
     @Published var potAmount = 0
     
@@ -56,7 +57,6 @@ struct MainView: View {
                 return
             }
         }
-
     }
     
     func UpdateDealer() {
@@ -75,12 +75,6 @@ struct MainView: View {
         gameInfo.highestBet = 0
         gameInfo.betsEqualized = false
         
-        if (gameInfo.whoIsDealer + 2 > playersList.players.count) {
-            gameInfo.whoseTurn = 0
-        } else {
-            gameInfo.whoseTurn = gameInfo.whoIsDealer + 1
-        }
-        
         for i in 0...(playersList.players.count - 1) {
             playersList.players[i].spentThisRound = 0
             
@@ -88,6 +82,34 @@ struct MainView: View {
                 playersList.players[i].hasPlayed = false
             }
         }
+        
+        
+        if (!playersList.players[gameInfo.sbPos].hasFolded) {
+            gameInfo.whoseTurn = gameInfo.sbPos
+            return
+        }
+        
+        let upper = (playersList.players.count - 1) - gameInfo.sbPos
+        
+        if (gameInfo.sbPos < playersList.players.count - 1) {
+            for i in (1...upper) {
+                if (!playersList.players[gameInfo.sbPos + i].hasFolded)  {
+                    gameInfo.sbPos += i
+                    gameInfo.whoseTurn = gameInfo.sbPos
+                    return
+                }
+            }
+        }
+        
+        for i in (0...playersList.players.count) {
+            if (!playersList.players[i].hasFolded)  {
+                gameInfo.sbPos = i
+                gameInfo.whoseTurn = gameInfo.sbPos
+                return
+            }
+        }
+        
+        
     }
     
     func ApplyRoles() {
@@ -132,9 +154,7 @@ struct MainView: View {
             }
         }
         
-        UpdateDealer()
-        UpdateTurn()
-        
+        AddBlinds()
         ApplyRoles()
     }
     
@@ -190,14 +210,14 @@ struct MainView: View {
                                 .imageScale(.large)
                         }
                     }
-                    
-                    ToolbarItem(placement: .navigationBarTrailing){
-                        Button {
-                            NewHand()
-                        } label:{
-                            Image(systemName: "digitalcrown.horizontal.arrow.counterclockwise")
-                        }
-                    }
+                    //
+                    //                    ToolbarItem(placement: .navigationBarTrailing){
+                    //                        Button {
+                    //                            NewHand()
+                    //                        } label:{
+                    //                            Image(systemName: "digitalcrown.horizontal.arrow.counterclockwise")
+                    //                        }
+                    //                    }
                 }
                 .onAppear(perform: ApplyRoles)
             }

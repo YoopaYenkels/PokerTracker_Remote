@@ -28,7 +28,7 @@ struct ActionsView: View {
             if (!playersList.players[i].hasFolded &&
                 (playersList.players[i].spentThisRound != gameInfo.highestBet ||
                  playersList.players[i].spentThisRound == 0 ||
-                 playersList.players[i].hasPlayed == false)) {
+                 !playersList.players[i].hasPlayed)) {
                 gameInfo.betsEqualized = false
                 return
             }
@@ -61,13 +61,14 @@ struct ActionsView: View {
         playersList.players[gameInfo.whoseTurn].hasPlayed = true
         gameInfo.numChecks += 1
         
-        if ((gameInfo.betState == .preflop &&
-             playersList.players[gameInfo.whoseTurn].myRole == PlayerRole.BigBlind &&
-             gameInfo.betsEqualized) ||
-            
+        CheckEqualBets()
+        
+        if (gameInfo.betsEqualized ||
             (gameInfo.betState == .regular &&
              gameInfo.numChecks == gameInfo.numActivePlayers)) {
             NewBettingRound()
+            ApplyRoles()
+            return
         }
         
         UpdateTurn()
@@ -120,39 +121,82 @@ struct ActionsView: View {
     
     var body: some View {
         NavigationView {
-            VStack (spacing: 30) {
-                HStack {
-                    HStack {
-                        Image(systemName: "arrow.up.circle")
-                        Text("\(playersList.players[gameInfo.whoseTurn].spentThisRound)")
-                    }
-                    .padding(.trailing, 10)
-                    
-                    HStack {
-                        Image(systemName: "dollarsign.circle")
-                        Text("\(playersList.players[gameInfo.whoseTurn].money)")
-                    }
-                    .foregroundColor(.secondary)
+            VStack (alignment: .leading, spacing: 30) {
+                VStack {
+                    MoneyStatusView(text: "Current",
+                                    image1: "arrow.up.circle",
+                                    image2: "dollarsign.cirle",
+                                    moneySpent: playersList.players[gameInfo.whoseTurn].spentThisRound,
+                                    totalMoney: playersList.players[gameInfo.whoseTurn].money)
+                    MoneyStatusView(text: "Call",
+                                    image1: "arrow.up.circle",
+                                    image2: "dollarsign.cirle",
+                                    moneySpent: playersList.players[gameInfo.whoseTurn].spentThisRound + gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound,
+                                    totalMoney: playersList.players[gameInfo.whoseTurn].money - gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)
+                    MoneyStatusView(text: "Raise",
+                                    image1: "arrow.up.circle",
+                                    image2: "dollarsign.cirle",
+                                    moneySpent: playersList.players[gameInfo.whoseTurn].spentThisRound + amountRaised,
+                                    totalMoney: playersList.players[gameInfo.whoseTurn].money - amountRaised)
+                        
                 }
+                
                 
                 Spacer()
                 
                 if (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound == 0) {
-                    Button("Check", action: Check)
+                    Button {
+                        Check()
+                    } label: {
+                        HStack{
+                            Text("Check")
+                            Spacer()
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(Color.green)                
                 } else {
-                    Button("Call", action: Call)
+                    Button {
+                        Call()
+                    } label: {
+                        HStack{
+                            Text("Call")
+                            Spacer()
+                            Image(systemName: "dollarsign.circle")
+                            Text("\(gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)")
+                        }
+                    }.buttonStyle(.borderedProminent)
                 }
                 
                 if (showRaise) {
                     HStack {
-                        Text("Raise by $\(amountRaised)")
-                        Stepper (value: $amountRaised,
-                                 in: gameInfo.minBet...playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)) {
+                        Button {
+                            SubmitRaise()
+                        } label: {
+                            HStack{
+                                Text("Raise")
+                                Spacer()
+                                Text("\(gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound) + $\(amountRaised)")
+                            }
                         }
-                    }.padding(.horizontal, 80)
+                        .buttonStyle(.bordered)
+                        Stepper (value: $amountRaised,
+                                 in: gameInfo.minBet...playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)) {}
+                    }
                 }
-                Button("Fold", role: .destructive, action: Fold)
+                
+                Button (role: .destructive) {
+                    Fold()
+                } label: {
+                    HStack{
+                        Text("Fold")
+                        Spacer()
+                        Image(systemName: "x.circle")
+                    }
+                }.buttonStyle(.bordered)
             }
+            .padding(.horizontal, 16)
             .onAppear(perform: ShowRaise)
             .navigationTitle("\(playersList.players[gameInfo.whoseTurn].name)'s Actions")
             .toolbar {
@@ -163,18 +207,33 @@ struct ActionsView: View {
                     }
                 }
                 
-                if (showRaise) {
-                    ToolbarItem (placement: .navigationBarTrailing) {
-                        Button {
-                            SubmitRaise()
-                        } label: {
-                            Text("Raise")
-                                .fontWeight(.bold)
-                        }
-                    }
-                }
             }
         }
-        
     }
+    
+    struct MoneyStatusView: View {
+        var text: String
+        var image1: String
+        var image2: String
+        
+        var moneySpent: Int
+        var totalMoney: Int
+        
+        var body: some View {
+            HStack {
+                Text(text)
+                Spacer()
+                Image(systemName: image1)
+                Text("\(moneySpent)")
+                
+                HStack {
+                    Image(systemName: image2)
+                    Text("\(totalMoney)")
+                }
+                .foregroundColor(.secondary)
+            }
+        }
+    }
+    
 }
+

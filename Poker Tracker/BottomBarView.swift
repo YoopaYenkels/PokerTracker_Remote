@@ -26,7 +26,7 @@ struct BottomBarView:View {
         if (playersList.players.count > 1) {
             VStack {
                 if (gameInfo.betState == .blinds) {
-                    Button ("Begin Hand", action: self.AddBlinds)
+                    Button ("Begin Hand", action: self.NewHand)
                         .buttonStyle(.borderedProminent)
                 } else if (!gameInfo.betsEqualized ||
                         (gameInfo.betsEqualized && playersList.players[gameInfo.whoseTurn].myRole == PlayerRole.BigBlind)) {
