@@ -41,23 +41,26 @@ struct PlayerHomeScreenRowView: View {
                 Image(systemName: "arrow.right")
                     .foregroundColor(.red)
             }
-            
-            
+              
             switch (player.myRole) {
             case .None:
                 Label(player.name, systemImage: "")
+                    .foregroundColor(player.myTurn && gameInfo.betState != .blinds ? .red : .black)
             case .Dealer:
                 Label(player.name + " (Dealer)", systemImage: "crown.fill")
-                    .foregroundColor(.green)
+                    .foregroundColor(player.myTurn ? .red : .black)
             case .SmallBlind:
-                Label {Text(player.name)} icon: {
+                Label {
+                    Text(player.name)
+                        .foregroundColor(player.myTurn ? .red : .black)
+                } icon: {
                     Image(systemName: "eye.slash.fill")
                         .imageScale(.small)
-                        .foregroundColor(.black)
+                        .foregroundColor(player.myTurn ? .red : .black)
                 }
             case .BigBlind:
                 Label(player.name, systemImage: "eye.slash.fill")
-                    .foregroundColor(.black)
+                    .foregroundColor(player.myTurn ? .red : .black)
             }
         
             Spacer()

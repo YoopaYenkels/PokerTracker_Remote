@@ -14,6 +14,7 @@ struct BottomBarView:View {
     
     @State private var showActions = false
     @State private var showRaise = false
+    @State private var showGivePot = false
     @State private var amountRaised = 0
     
     var AddBlinds: () -> Void
@@ -28,32 +29,46 @@ struct BottomBarView:View {
                 if (gameInfo.betState == .blinds) {
                     Button ("Begin Hand", action: self.NewHand)
                         .buttonStyle(.borderedProminent)
-                } else if (!gameInfo.betsEqualized ||
-                        (gameInfo.betsEqualized && playersList.players[gameInfo.whoseTurn].myRole == PlayerRole.BigBlind)) {
-                        Button {
-                            showActions.toggle()
-                        } label: {
-                            Text("\(playersList.players[gameInfo.whoseTurn].name)'s Turn")
-                        }
-                        .buttonStyle(.bordered)
-                        .sheet(isPresented: $showActions) {
-                            ActionsView(showRaise: $showRaise,
-                                        amountRaised: $amountRaised,
-                                        UpdateTurn: UpdateTurn,
-                                        ApplyRoles: ApplyRoles,
-                                        NewBettingRound: NewBettingRound)
-                                .presentationDetents([.medium])
-                        }.onDisappear(perform: {amountRaised = gameInfo.minBet})
+                } else if (!gameInfo.betsEqualized && gameInfo.bettingRound < 3) {
+                    Button {
+                        showActions.toggle()
+                    } label: {
+                        Text("\(playersList.players[gameInfo.whoseTurn].name)'s Turn")
+                    }
+                    .buttonStyle(.bordered)
+                    .sheet(isPresented: $showActions) {
+                        ActionsView(showRaise: $showRaise,
+                                    amountRaised: $amountRaised,
+                                    UpdateTurn: UpdateTurn,
+                                    ApplyRoles: ApplyRoles,
+                                    NewBettingRound: NewBettingRound)
+                        .presentationDetents([.medium])
+                    }.onDisappear(perform: {
+                        amountRaised = gameInfo.minBet
+                    })
+                } else if (!gameInfo.potGiven) {
+                    Button {
+                        showGivePot.toggle()
+                    } label: {
+                        Text("SHOWDOWN")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.black)
+                    .sheet(isPresented: $showGivePot) {
+                        GivePot()
+                            .presentationDetents([.medium])
                     }
                 }
             }
         }
-        
     }
-    
+}
+
+
+
 struct ActionButton: View {
     var text: String
-
+    
     var body: some View {
         Button(text, action: {})
             .foregroundColor(.white)

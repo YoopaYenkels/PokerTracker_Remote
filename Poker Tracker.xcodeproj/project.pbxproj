@@ -15,6 +15,7 @@
 		C74D32FC296CF28800654DE6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C74D32FB296CF28800654DE6 /* Assets.xcassets */; };
 		C74D32FF296CF28800654DE6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C74D32FE296CF28800654DE6 /* Preview Assets.xcassets */; };
 		C791A11C29724ED300348973 /* ActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C791A11B29724ED300348973 /* ActionsView.swift */; };
+		C791A11E297611D700348973 /* GivePot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C791A11D297611D700348973 /* GivePot.swift */; };
 		C7F02F58296DBAFF0021F341 /* PlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F02F57296DBAFF0021F341 /* PlayerManager.swift */; };
 		C7F02F5A296E1F710021F341 /* AddPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F02F59296E1F710021F341 /* AddPlayer.swift */; };
 /* End PBXBuildFile section */
@@ -29,6 +30,7 @@
 		C74D32FB296CF28800654DE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C74D32FE296CF28800654DE6 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C791A11B29724ED300348973 /* ActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionsView.swift; sourceTree = "<group>"; };
+		C791A11D297611D700348973 /* GivePot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GivePot.swift; sourceTree = "<group>"; };
 		C7F02F57296DBAFF0021F341 /* PlayerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerManager.swift; sourceTree = "<group>"; };
 		C7F02F59296E1F710021F341 /* AddPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPlayer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -68,6 +70,7 @@
 				C74D32F7296CF28600654DE6 /* Poker_TrackerApp.swift */,
 				C74D32F9296CF28600654DE6 /* MainView.swift */,
 				C7321F072970D0110077CF7D /* BottomBarView.swift */,
+				C791A11D297611D700348973 /* GivePot.swift */,
 				C791A11B29724ED300348973 /* ActionsView.swift */,
 				C7F02F57296DBAFF0021F341 /* PlayerManager.swift */,
 				C7F02F59296E1F710021F341 /* AddPlayer.swift */,
@@ -162,6 +165,7 @@
 				C7321F082970D0120077CF7D /* BottomBarView.swift in Sources */,
 				C74D32F8296CF28600654DE6 /* Poker_TrackerApp.swift in Sources */,
 				C7F02F58296DBAFF0021F341 /* PlayerManager.swift in Sources */,
+				C791A11E297611D700348973 /* GivePot.swift in Sources */,
 				C7321F06297067A00077CF7D /* PlayersView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -21,6 +21,7 @@ class GameInfo: ObservableObject {
     var sbPos: Int = 1
     
     @Published var potAmount = 0
+    var potGiven = false
     
     // change in settings
     @State var minBet = 2
@@ -31,8 +32,10 @@ class GameInfo: ObservableObject {
     @Published var betState: BetState = .blinds
     var betsEqualized: Bool = false
     var bettingRound: Int = 0
+    
     var numChecks: Int = 0
     var numActivePlayers: Int = 0
+  
 }
 
 struct MainView: View {
@@ -46,6 +49,7 @@ struct MainView: View {
             for i in (1...upper) {
                 if (!playersList.players[gameInfo.whoseTurn + i].hasFolded)  {
                     gameInfo.whoseTurn = gameInfo.whoseTurn + i
+                    playersList.players[gameInfo.whoseTurn].myTurn = true
                     return
                 }
             }
@@ -54,6 +58,7 @@ struct MainView: View {
         for i in (0...playersList.players.count) {
             if (!playersList.players[i].hasFolded)  {
                 gameInfo.whoseTurn = i
+                playersList.players[i].myTurn = true
                 return
             }
         }
@@ -108,8 +113,6 @@ struct MainView: View {
                 return
             }
         }
-        
-        
     }
     
     func ApplyRoles() {
@@ -141,9 +144,9 @@ struct MainView: View {
     }
     
     func NewHand() {
-        // must first give pot amount to winning player, then set to 0
-        gameInfo.potAmount = 0
+        gameInfo.potGiven = false
         gameInfo.betState = .blinds
+        gameInfo.bettingRound = 0
         gameInfo.betsEqualized = false
         gameInfo.numActivePlayers = playersList.players.count
         
@@ -154,6 +157,12 @@ struct MainView: View {
             }
         }
         
+        if (gameInfo.whoIsDealer < playersList.players.count - 3) {
+            gameInfo.whoseTurn = gameInfo.whoIsDealer + 3
+        } else {
+            gameInfo.whoseTurn = gameInfo.whoIsDealer - 4
+        }
+
         AddBlinds()
         ApplyRoles()
     }
@@ -186,12 +195,12 @@ struct MainView: View {
                 VStack {
                     VStack (alignment: .leading) {
                         Text("Bet State: \(gameInfo.betState.rawValue) (\(gameInfo.bettingRound))")
-                        Text("Min Bet: \(gameInfo.minBet)")
-                        Text("Highest Bet: \(gameInfo.highestBet)")
-                        Text("Num checks: \(gameInfo.numChecks)")
-                        Text("Bets Equalized: \(String(gameInfo.betsEqualized))")
-                        Text("Whose Turn: \(playersList.players[gameInfo.whoseTurn].name)")
-                        Text("Active Players: \(gameInfo.numActivePlayers)")
+                        Text("SB Pos: \(gameInfo.sbPos)")
+//                        Text("Highest Bet: \(gameInfo.highestBet)")
+//                        Text("Num checks: \(gameInfo.numChecks)")
+//                        Text("Bets Equalized: \(String(gameInfo.betsEqualized))")
+//                        Text("Whose Turn: \(playersList.players[gameInfo.whoseTurn].name)")
+//                        Text("Active Players: \(gameInfo.numActivePlayers)")
                     }
                     PotView()
                         .padding(.top, 30)
@@ -210,14 +219,17 @@ struct MainView: View {
                                 .imageScale(.large)
                         }
                     }
-                    //
-                    //                    ToolbarItem(placement: .navigationBarTrailing){
-                    //                        Button {
-                    //                            NewHand()
-                    //                        } label:{
-                    //                            Image(systemName: "digitalcrown.horizontal.arrow.counterclockwise")
-                    //                        }
-                    //                    }
+
+                
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button {
+                            UpdateDealer()
+                            NewHand()
+                        } label:{
+                            Image(systemName: "digitalcrown.horizontal.arrow.counterclockwise")
+                        }
+                    }
+                    
                 }
                 .onAppear(perform: ApplyRoles)
             }

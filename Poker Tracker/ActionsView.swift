@@ -17,6 +17,8 @@ struct ActionsView: View {
     @Binding var showRaise: Bool
     @Binding var amountRaised: Int
     
+    @State private var showFoldConfimation = false
+    
     var UpdateTurn: () -> Void
     var ApplyRoles: () -> Void
     var NewBettingRound: () -> Void
@@ -49,6 +51,7 @@ struct ActionsView: View {
         if (gameInfo.betsEqualized) {
             NewBettingRound()
             ApplyRoles()
+            dismiss()
             return
         }
         
@@ -64,10 +67,10 @@ struct ActionsView: View {
         CheckEqualBets()
         
         if (gameInfo.betsEqualized ||
-            (gameInfo.betState == .regular &&
-             gameInfo.numChecks == gameInfo.numActivePlayers)) {
+             gameInfo.numChecks == gameInfo.numActivePlayers) {
             NewBettingRound()
             ApplyRoles()
+            dismiss()
             return
         }
         
@@ -108,9 +111,11 @@ struct ActionsView: View {
         
         CheckEqualBets()
         
-        if (gameInfo.betsEqualized) {
+        if (gameInfo.betsEqualized ||
+            gameInfo.numChecks == gameInfo.numActivePlayers) {
             NewBettingRound()
             ApplyRoles()
+            dismiss()
             return
         }
         
@@ -122,25 +127,25 @@ struct ActionsView: View {
     var body: some View {
         NavigationView {
             VStack (alignment: .leading, spacing: 30) {
-                VStack {
+                VStack (spacing: 20) {
                     MoneyStatusView(text: "Current",
                                     image1: "arrow.up.circle",
-                                    image2: "dollarsign.cirle",
+                                    image2: "dollarsign.circle",
                                     moneySpent: playersList.players[gameInfo.whoseTurn].spentThisRound,
                                     totalMoney: playersList.players[gameInfo.whoseTurn].money)
                     MoneyStatusView(text: "Call",
                                     image1: "arrow.up.circle",
-                                    image2: "dollarsign.cirle",
-                                    moneySpent: playersList.players[gameInfo.whoseTurn].spentThisRound + gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound,
-                                    totalMoney: playersList.players[gameInfo.whoseTurn].money - gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)
-                    MoneyStatusView(text: "Raise",
-                                    image1: "arrow.up.circle",
-                                    image2: "dollarsign.cirle",
-                                    moneySpent: playersList.players[gameInfo.whoseTurn].spentThisRound + amountRaised,
-                                    totalMoney: playersList.players[gameInfo.whoseTurn].money - amountRaised)
-                        
+                                    image2: "dollarsign.circle",
+                                    moneySpent: gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound,
+                                    totalMoney: playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound))
+                    if (showRaise) {
+                        MoneyStatusView(text: "Raise",
+                                        image1: "arrow.up.circle",
+                                        image2: "dollarsign.circle",
+                                        moneySpent: (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound) + amountRaised,
+                                        totalMoney: playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound) - amountRaised)
+                    }
                 }
-                
                 
                 Spacer()
                 
@@ -187,16 +192,24 @@ struct ActionsView: View {
                 }
                 
                 Button (role: .destructive) {
-                    Fold()
+                    showFoldConfimation = true
                 } label: {
                     HStack{
                         Text("Fold")
                         Spacer()
                         Image(systemName: "x.circle")
                     }
-                }.buttonStyle(.bordered)
+                }
+                .buttonStyle(.bordered)
+                    .confirmationDialog("Confirm Fold", isPresented: $showFoldConfimation) {
+                        Button ("Fold", role: .destructive) {
+                            Fold()
+                        }
+                    } message: {
+                        Text("Are you sure?") 
+                    }
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 20)
             .onAppear(perform: ShowRaise)
             .navigationTitle("\(playersList.players[gameInfo.whoseTurn].name)'s Actions")
             .toolbar {
