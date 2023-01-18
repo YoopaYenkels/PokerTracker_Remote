@@ -8,11 +8,26 @@
 import Foundation
 import SwiftUI
 
+struct Pot: Identifiable {
+    var id = UUID()
+    var name: String = ""
+    var money: Int = 0
+}
+
+class PotList: ObservableObject {
+    @Published var pots: [Pot] = [Pot(name: "Main", money: 0)]
+    var currentPot: Int = 0
+    @Published var totalBets = 0
+}
+
 struct PotView: View {
     @EnvironmentObject var gameInfo: GameInfo
+    @EnvironmentObject var potList: PotList
     
     var body: some View {
         VStack {
+            Divider()
+            
             HStack (spacing: 20){
                 Image(systemName: "suit.club.fill")
                     .resizable()
@@ -24,13 +39,12 @@ struct PotView: View {
                     .scaledToFit()
                     .frame(width: 34, height: 34)
                     .foregroundColor(.red)
-                    
+                
                 
                 Image(systemName: "suit.spade.fill")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 34, height: 34)
-                    
                 
                 Image(systemName: "suit.diamond.fill")
                     .resizable()
@@ -42,17 +56,19 @@ struct PotView: View {
                 .frame(width: 300, height: 4)
                 .overlay(.black)
             
-            Text("Pot")
-                .font(.system(size: 40, weight: .regular))
-           
+          
+            ForEach(potList.pots) { pot in
+                VStack{
+                    Text("\(pot.name)")
+                    Text("$\(pot.money)")
+                }
+            }
             
-            Text("$\(gameInfo.potAmount)")
-                .font(.system(size: 40, weight: .light))
             
             Divider()
                 .frame(width: 300, height: 4)
                 .overlay(.black)
-         
+            
         }
     }
 }

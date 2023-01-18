@@ -20,7 +20,6 @@ class GameInfo: ObservableObject {
     @Published var whoseTurn: Int = 3
     var sbPos: Int = 1
     
-    @Published var potAmount = 0
     var potGiven = false
     
     // change in settings
@@ -33,14 +32,16 @@ class GameInfo: ObservableObject {
     var betsEqualized: Bool = false
     var bettingRound: Int = 0
     
+    var numRaises: Int = 0
     var numChecks: Int = 0
     var numActivePlayers: Int = 0
-  
+    
 }
 
 struct MainView: View {
     @EnvironmentObject var playersList: PlayersList
     @EnvironmentObject var gameInfo: GameInfo
+    @EnvironmentObject var potList: PotList
     
     func UpdateTurn() {
         let upper = (playersList.players.count - 1) - gameInfo.whoseTurn
@@ -77,8 +78,11 @@ struct MainView: View {
         
         gameInfo.bettingRound += 1
         gameInfo.numChecks = 0
+        gameInfo.numRaises = 0
         gameInfo.highestBet = 0
         gameInfo.betsEqualized = false
+        
+        potList.totalBets = 0
         
         for i in 0...(playersList.players.count - 1) {
             playersList.players[i].spentThisRound = 0
@@ -101,7 +105,7 @@ struct MainView: View {
                 if (!playersList.players[gameInfo.sbPos + i].hasFolded)  {
                     gameInfo.sbPos += i
                     gameInfo.whoseTurn = gameInfo.sbPos
-                    return
+                    return  
                 }
             }
         }
@@ -150,6 +154,8 @@ struct MainView: View {
         gameInfo.betsEqualized = false
         gameInfo.numActivePlayers = playersList.players.count
         
+        potList.currentPot = 0
+        
         if (playersList.players.count > 1) {
             for i in 0...(playersList.players.count - 1) {
                 playersList.players[i].spentThisRound = 0
@@ -160,10 +166,15 @@ struct MainView: View {
         if (gameInfo.whoIsDealer < playersList.players.count - 3) {
             gameInfo.whoseTurn = gameInfo.whoIsDealer + 3
         } else {
-            gameInfo.whoseTurn = gameInfo.whoIsDealer - 4
+            gameInfo.whoseTurn = abs(playersList.players.count - gameInfo.whoIsDealer - 3)
         }
-
-        AddBlinds()
+        
+        if (gameInfo.whoIsDealer < playersList.players.count - 1) {
+            gameInfo.sbPos = gameInfo.whoIsDealer + 1
+        } else {
+            gameInfo.sbPos = abs(playersList.players.count - gameInfo.whoIsDealer - 1)
+        }
+        
         ApplyRoles()
     }
     
@@ -174,11 +185,11 @@ struct MainView: View {
                 case .SmallBlind:
                     playersList.players[i].money -= gameInfo.minBet/2
                     playersList.players[i].spentThisRound += gameInfo.minBet/2
-                    gameInfo.potAmount += gameInfo.minBet/2
+                    potList.totalBets += gameInfo.minBet/2
                 case .BigBlind:
                     playersList.players[i].money -= gameInfo.minBet
                     playersList.players[i].spentThisRound += gameInfo.minBet
-                    gameInfo.potAmount += gameInfo.minBet
+                    potList.totalBets += gameInfo.minBet
                 default: ()
                 }
             }
@@ -194,17 +205,22 @@ struct MainView: View {
                 Color(.white).ignoresSafeArea()
                 VStack {
                     VStack (alignment: .leading) {
-                        Text("Bet State: \(gameInfo.betState.rawValue) (\(gameInfo.bettingRound))")
-                        Text("SB Pos: \(gameInfo.sbPos)")
-//                        Text("Highest Bet: \(gameInfo.highestBet)")
-//                        Text("Num checks: \(gameInfo.numChecks)")
-//                        Text("Bets Equalized: \(String(gameInfo.betsEqualized))")
-//                        Text("Whose Turn: \(playersList.players[gameInfo.whoseTurn].name)")
-//                        Text("Active Players: \(gameInfo.numActivePlayers)")
+                        
+                        Text("Num Checks: \(gameInfo.numChecks)")
+                        Text("Highest Bet: \(gameInfo.highestBet)")
+                        Text("current Pot: \(potList.currentPot)")
+                        Text("Total Bets: \(potList.totalBets)")
+                        //                        Text("Whose Turn: \(playersList.players[gameInfo.whoseTurn].name)  \(gameInfo.whoseTurn)")
+                        //                        Text("Active Players: \(gameInfo.numActivePlayers)")
                     }
                     PotView()
-                        .padding(.top, 30)
+                    
+                    Text("Round: \(gameInfo.betState.rawValue) \(gameInfo.bettingRound)")
+                    
+                    Text("Num Raises: \(gameInfo.numRaises)")
+                    
                     PlayersView()
+                    Divider()
                     BottomBarView(AddBlinds: self.AddBlinds,
                                   NewHand: self.NewHand,
                                   UpdateTurn: self.UpdateTurn,
@@ -219,8 +235,8 @@ struct MainView: View {
                                 .imageScale(.large)
                         }
                     }
-
-                
+                    
+                    
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
                             UpdateDealer()
@@ -242,5 +258,6 @@ struct MainView_Previews: PreviewProvider {
         MainView()
             .environmentObject(GameInfo())
             .environmentObject(PlayersList())
+            .environmentObject(PotList())
     }
 }

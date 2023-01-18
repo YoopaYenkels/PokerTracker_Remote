@@ -26,9 +26,15 @@ struct BottomBarView:View {
     var body: some View {
         if (playersList.players.count > 1) {
             VStack {
+                //Text("show raise: \(String(showRaise))")
                 if (gameInfo.betState == .blinds) {
-                    Button ("Begin Hand", action: self.NewHand)
-                        .buttonStyle(.borderedProminent)
+                    Button {
+                        self.NewHand()
+                        self.AddBlinds()
+                    } label: {
+                        Text("Begin Hand")
+                    }
+                    .buttonStyle(.borderedProminent)
                 } else if (!gameInfo.betsEqualized && gameInfo.bettingRound < 3) {
                     Button {
                         showActions.toggle()

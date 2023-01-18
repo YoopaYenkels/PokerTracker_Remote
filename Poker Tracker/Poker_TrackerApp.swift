@@ -11,12 +11,14 @@ import SwiftUI
 struct Poker_TrackerApp: App {
     @StateObject var gameInfo = GameInfo()
     @StateObject var playersList = PlayersList()
+    @StateObject var potList = PotList()
     
     var body: some Scene {
         WindowGroup {
             MainView()
                 .environmentObject(gameInfo)
                 .environmentObject(playersList)
+                .environmentObject(potList)
         }
     }
 }

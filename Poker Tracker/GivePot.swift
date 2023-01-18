@@ -13,16 +13,17 @@ struct GivePot: View {
     
     @EnvironmentObject var playersList: PlayersList
     @EnvironmentObject var gameInfo: GameInfo
+    @EnvironmentObject var potList: PotList
     
     @State private var selection = Set<UUID>()
     
     func AwardPot() {
         for i in 0...(playersList.players.count - 1) {
             if (selection.contains(playersList.players[i].id)) {
-                playersList.players[i].money += gameInfo.potAmount/selection.count   
+                playersList.players[i].money += potList.pots[0].money/selection.count
             }
         }
-        gameInfo.potAmount = 0
+        potList.pots[0].money = 0
         gameInfo.potGiven = true
         
         dismiss()
@@ -43,7 +44,7 @@ struct GivePot: View {
                 .background(.white)
                 
                 
-                Button ("Submit", action: AwardPot)
+                Button ("Award Pot", action: AwardPot)
                     .buttonStyle(.borderedProminent)
                 
                 .toolbar {

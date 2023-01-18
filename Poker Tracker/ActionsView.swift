@@ -8,79 +8,112 @@
 import Foundation
 import SwiftUI
 
+struct PlacedBet {
+    var id: UUID
+    var name: String
+    var amount: Int
+}
+
 struct ActionsView: View {
     @Environment(\.dismiss) var dismiss
     
     @EnvironmentObject var playersList: PlayersList
     @EnvironmentObject var gameInfo: GameInfo
+    @EnvironmentObject var potList: PotList
     
     @Binding var showRaise: Bool
     @Binding var amountRaised: Int
     
-    @State private var showFoldConfimation = false
+    @State private var showFoldConfirmation = false
     
     var UpdateTurn: () -> Void
     var ApplyRoles: () -> Void
     var NewBettingRound: () -> Void
+    
+    
+    func CreatePots() {
+        var placedBets: [PlacedBet] = []
+        
+        for i in 0...(playersList.players.count - 1) {
+            placedBets.append(PlacedBet(id: playersList.players[i].id,
+                                        name: playersList.players[i].name,
+                                        amount: playersList.players[i].spentThisRound))
+        }
+        
+        placedBets.sort {$0.amount < $1.amount}
+        print(placedBets)
+        //        if (playersList.players[i].allIn == true &&
+        //            playersList.players[i].spentThisRound > 0) {
+        //
+        //            let remaining = (potList.totalBets - playersList.players[i].spentThisRound * gameInfo.numActivePlayers)
+        //
+        //            potList.pots[potList.currentPot].money = playersList.players[i].spentThisRound * gameInfo.numActivePlayers
+        //
+        //            potList.currentPot += 1
+        //            potList.pots.append(Pot(name: "Side Pot \(potList.currentPot)", money: remaining))
+        //        }
+        
+    }
     
     func CheckEqualBets() {
         gameInfo.betsEqualized = true
         
         for i in 0...(playersList.players.count - 1) {
             if (!playersList.players[i].hasFolded &&
-                (playersList.players[i].spentThisRound != gameInfo.highestBet ||
-                 playersList.players[i].spentThisRound == 0 ||
+                ((playersList.players[i].spentThisRound != gameInfo.highestBet && !playersList.players[i].allIn) ||
+                 (playersList.players[i].spentThisRound == 0 && !playersList.players[i].allIn) ||
                  !playersList.players[i].hasPlayed)) {
                 gameInfo.betsEqualized = false
-                return
+                break
             }
+        }
+        
+        if (gameInfo.betsEqualized ||
+            gameInfo.numChecks == gameInfo.numActivePlayers) {
+            CreatePots()
+            NewBettingRound()
+            ApplyRoles()
+            dismiss()
+        }
+        else {
+            UpdateTurn()
+            ApplyRoles()
+            dismiss()
         }
     }
     
     func Call() {
-        let amountToCall = (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)
+        var amountToCall = 0
+        
+        if ((gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)
+            <= playersList.players[gameInfo.whoseTurn].money) {
+            amountToCall = gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound
+        }
+        else {
+            amountToCall = playersList.players[gameInfo.whoseTurn].money
+            playersList.players[gameInfo.whoseTurn].allIn = true
+        }
         
         playersList.players[gameInfo.whoseTurn].money -= amountToCall
         playersList.players[gameInfo.whoseTurn].spentThisRound += amountToCall
-        gameInfo.potAmount += amountToCall
+        potList.totalBets += amountToCall
         
         playersList.players[gameInfo.whoseTurn].hasPlayed = true
-        
+        showRaise = false
         CheckEqualBets()
-        
-        if (gameInfo.betsEqualized) {
-            NewBettingRound()
-            ApplyRoles()
-            dismiss()
-            return
-        }
-        
-        UpdateTurn()
-        ApplyRoles()
-        dismiss()
     }
     
     func Check() {
         playersList.players[gameInfo.whoseTurn].hasPlayed = true
         gameInfo.numChecks += 1
-        
+        showRaise = false
         CheckEqualBets()
-        
-        if (gameInfo.betsEqualized ||
-             gameInfo.numChecks == gameInfo.numActivePlayers) {
-            NewBettingRound()
-            ApplyRoles()
-            dismiss()
-            return
-        }
-        
-        UpdateTurn()
-        ApplyRoles()
-        dismiss()
     }
     
     func ShowRaise() {
-        if (gameInfo.minBet <= (playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound))) {
+        if ((gameInfo.minBet <= playersList.players[gameInfo.whoseTurn].money - gameInfo.highestBet)
+            && (gameInfo.numRaises < 3 ||
+                playersList.players.count == 2)) {
             showRaise = true
         }
         amountRaised = gameInfo.minBet
@@ -89,39 +122,33 @@ struct ActionsView: View {
     func SubmitRaise() {
         let amountToCall = (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)
         
+        if (amountToCall + amountRaised > playersList.players[gameInfo.whoseTurn].money) {
+            playersList.players[gameInfo.whoseTurn].allIn = true
+        }
+        
         playersList.players[gameInfo.whoseTurn].spentThisRound += amountToCall + amountRaised
         playersList.players[gameInfo.whoseTurn].money -= amountToCall + amountRaised
-        gameInfo.potAmount += amountToCall + amountRaised
+        potList.totalBets += amountToCall + amountRaised
         
         gameInfo.highestBet = playersList.players[gameInfo.whoseTurn].spentThisRound
+        gameInfo.numRaises += 1
         
         playersList.players[gameInfo.whoseTurn].hasPlayed = true
+        showRaise = false
         
         UpdateTurn()
         ApplyRoles()
         
-        showRaise = false
         dismiss()
     }
     
     func Fold() {
+        showRaise = false
         playersList.players[gameInfo.whoseTurn].hasPlayed = true
         playersList.players[gameInfo.whoseTurn].hasFolded = true
         gameInfo.numActivePlayers -= 1
         
         CheckEqualBets()
-        
-        if (gameInfo.betsEqualized ||
-            gameInfo.numChecks == gameInfo.numActivePlayers) {
-            NewBettingRound()
-            ApplyRoles()
-            dismiss()
-            return
-        }
-        
-        UpdateTurn()
-        ApplyRoles()
-        dismiss()
     }
     
     var body: some View {
@@ -133,23 +160,24 @@ struct ActionsView: View {
                                     image2: "dollarsign.circle",
                                     moneySpent: playersList.players[gameInfo.whoseTurn].spentThisRound,
                                     totalMoney: playersList.players[gameInfo.whoseTurn].money)
-                    MoneyStatusView(text: "Call",
-                                    image1: "arrow.up.circle",
-                                    image2: "dollarsign.circle",
-                                    moneySpent: gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound,
-                                    totalMoney: playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound))
-                    if (showRaise) {
-                        MoneyStatusView(text: "Raise",
-                                        image1: "arrow.up.circle",
-                                        image2: "dollarsign.circle",
-                                        moneySpent: (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound) + amountRaised,
-                                        totalMoney: playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound) - amountRaised)
-                    }
+                    //                    MoneyStatusView(text: "Call",
+                    //                                    image1: "arrow.up.circle",
+                    //                                    image2: "dollarsign.circle",
+                    //                                    moneySpent: gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound,
+                    //                                    totalMoney: playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound))
+                    //                    if (showRaise) {
+                    //                        MoneyStatusView(text: "Raise",
+                    //                                        image1: "arrow.up.circle",
+                    //                                        image2: "dollarsign.circle",
+                    //                                        moneySpent: (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound) + amountRaised,
+                    //                                        totalMoney: playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound) - amountRaised)
+                    //                    }
                 }
                 
                 Spacer()
                 
-                if (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound == 0) {
+                if ((gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound == 0) ||
+                    playersList.players[gameInfo.whoseTurn].allIn) {
                     Button {
                         Check()
                     } label: {
@@ -160,8 +188,9 @@ struct ActionsView: View {
                         }
                     }
                     .buttonStyle(.borderedProminent)
-                    .tint(Color.green)                
-                } else {
+                    .tint(Color.green)
+                } else if (!playersList.players[gameInfo.whoseTurn].allIn &&
+                           playersList.players[gameInfo.whoseTurn].money > 0) {
                     Button {
                         Call()
                     } label: {
@@ -169,7 +198,8 @@ struct ActionsView: View {
                             Text("Call")
                             Spacer()
                             Image(systemName: "dollarsign.circle")
-                            Text("\(gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)")
+                            (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)
+                            < playersList.players[gameInfo.whoseTurn].money ? Text("\(gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)") : Text(" \(playersList.players[gameInfo.whoseTurn].money) (ALL IN)")
                         }
                     }.buttonStyle(.borderedProminent)
                 }
@@ -182,17 +212,22 @@ struct ActionsView: View {
                             HStack{
                                 Text("Raise")
                                 Spacer()
+                                (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound + amountRaised) == playersList.players[gameInfo.whoseTurn].money ?
+                                Text("ALL IN") :
                                 Text("\(gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound) + $\(amountRaised)")
                             }
                         }
                         .buttonStyle(.bordered)
+                        
                         Stepper (value: $amountRaised,
-                                 in: gameInfo.minBet...playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)) {}
+                                 in: gameInfo.minBet...(playersList.players[gameInfo.whoseTurn].money
+                                                        - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound))) {}
+                        
                     }
                 }
                 
                 Button (role: .destructive) {
-                    showFoldConfimation = true
+                    showFoldConfirmation = true
                 } label: {
                     HStack{
                         Text("Fold")
@@ -201,13 +236,13 @@ struct ActionsView: View {
                     }
                 }
                 .buttonStyle(.bordered)
-                    .confirmationDialog("Confirm Fold", isPresented: $showFoldConfimation) {
-                        Button ("Fold", role: .destructive) {
-                            Fold()
-                        }
-                    } message: {
-                        Text("Are you sure?") 
+                .confirmationDialog("Confirm Fold", isPresented: $showFoldConfirmation) {
+                    Button ("Fold", role: .destructive) {
+                        Fold()
                     }
+                } message: {
+                    Text("Are you sure?")
+                }
             }
             .padding(.horizontal, 20)
             .onAppear(perform: ShowRaise)
@@ -247,6 +282,4 @@ struct ActionsView: View {
             }
         }
     }
-    
 }
-

@@ -74,20 +74,21 @@ struct Player: Identifiable {
     
     var myRole: PlayerRole = PlayerRole.None
     var myTurn: Bool = false
-
+    
+    var allIn: Bool = false
     var hasPlayed: Bool = false
     var hasFolded: Bool = false
 }
 
 class PlayersList: ObservableObject {
     @Published var players: [Player] = [
-        Player(name: "Alice"),
-        Player(name: "Bob"),
-        Player(name: "Chaz"),
-        Player(name: "Dave")
+        Player(name: "Alice", money: 3),
+        Player(name: "Bob", money:  6),
+        Player(name: "Chaz", money: 22),
+        Player(name: "Dave", money: 10)
 //        Player(name: "Emma"),
-//        Player(name: "Fred"),
-//        Player(name: "Gwen")
+//        Player(name: "Fred")
+//        Player(name: "Gwen"),
 //        Player(name: "Hera")
 //        Player(name: "Iola"),
 //        Player(name: "Jeff")
@@ -113,9 +114,8 @@ struct PlayerRowView: View {
             
             Label("\(player.money)", systemImage: "dollarsign.circle")
                 .foregroundColor(.secondary)
-                .font(.system(size: 24, weight: .light))
-        }.frame(height: 20)
-        
+                .font(.system(size: 20, weight: .light))
+        }
     }
 }
 
