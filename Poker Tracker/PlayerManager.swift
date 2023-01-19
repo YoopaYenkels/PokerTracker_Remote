@@ -83,9 +83,9 @@ struct Player: Identifiable {
 class PlayersList: ObservableObject {
     @Published var players: [Player] = [
         Player(name: "Alice", money: 3),
-        Player(name: "Bob", money:  6),
-        Player(name: "Chaz", money: 22),
-        Player(name: "Dave", money: 10)
+        Player(name: "Bob", money:  5),
+        Player(name: "Chaz", money: 8),
+        Player(name: "Dave", money: 20)
 //        Player(name: "Emma"),
 //        Player(name: "Fred")
 //        Player(name: "Gwen"),

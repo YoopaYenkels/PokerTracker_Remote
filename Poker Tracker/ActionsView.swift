@@ -8,10 +8,12 @@
 import Foundation
 import SwiftUI
 
-struct PlacedBet {
+struct PlacedBet : Equatable {
     var id: UUID
     var name: String
     var amount: Int
+    var playerFolded: Bool
+    var allIn: Bool
 }
 
 struct ActionsView: View {
@@ -33,26 +35,47 @@ struct ActionsView: View {
     
     func CreatePots() {
         var placedBets: [PlacedBet] = []
+        var newPotRequired: Bool = false
         
         for i in 0...(playersList.players.count - 1) {
-            placedBets.append(PlacedBet(id: playersList.players[i].id,
-                                        name: playersList.players[i].name,
-                                        amount: playersList.players[i].spentThisRound))
+            if (playersList.players[i].spentThisRound > 0) {
+                placedBets.append(PlacedBet(id: playersList.players[i].id,
+                                            name: playersList.players[i].name,
+                                            amount: playersList.players[i].spentThisRound,
+                                            playerFolded: playersList.players[i].hasFolded,
+                                            allIn: playersList.players[i].allIn))
+            }
         }
-        
-        placedBets.sort {$0.amount < $1.amount}
-        print(placedBets)
-        //        if (playersList.players[i].allIn == true &&
-        //            playersList.players[i].spentThisRound > 0) {
-        //
-        //            let remaining = (potList.totalBets - playersList.players[i].spentThisRound * gameInfo.numActivePlayers)
-        //
-        //            potList.pots[potList.currentPot].money = playersList.players[i].spentThisRound * gameInfo.numActivePlayers
-        //
-        //            potList.currentPot += 1
-        //            potList.pots.append(Pot(name: "Side Pot \(potList.currentPot)", money: remaining))
-        //        }
-        
+        placedBets.sort { $0.amount < $1.amount }
+
+        for i in 0...(placedBets.count - 1) {
+            if (placedBets[i].amount != 0 && !placedBets[i].playerFolded) {
+                var moneyToAdd = 0
+                let betToSubtract = placedBets[i].amount
+                for pos in 0...(placedBets.count - 1) {
+                    if (placedBets[pos].amount > 0) {
+                        placedBets[pos].amount -= betToSubtract
+                        moneyToAdd += betToSubtract
+                    }
+                }
+                             
+                if (newPotRequired) {
+                    print("pot \(potList.currentPot) is closed")
+                    potList.currentPot += 1
+                    potList.pots.append(Pot(name: "Side Pot \(potList.currentPot)",
+                                            money: 0))
+                }  
+                potList.pots[(potList.currentPot)].money += moneyToAdd
+            }
+            
+            // create a side pot if someone's bet is all in and less than all the others
+            let firstNonZero = placedBets.first(where: { $0.amount != 0 })
+            newPotRequired = !placedBets.allSatisfy({ $0.amount == firstNonZero?.amount })
+            print(placedBets)
+        }
+//                else if (placedBets[i].playerFolded && placedBets[i].amount > 0) {
+//                    potList.pots[potList.currentPot].money += placedBets[pos].amount
+//                }
     }
     
     func CheckEqualBets() {
@@ -86,7 +109,7 @@ struct ActionsView: View {
         var amountToCall = 0
         
         if ((gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)
-            <= playersList.players[gameInfo.whoseTurn].money) {
+            < playersList.players[gameInfo.whoseTurn].money) {
             amountToCall = gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound
         }
         else {
@@ -122,7 +145,7 @@ struct ActionsView: View {
     func SubmitRaise() {
         let amountToCall = (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)
         
-        if (amountToCall + amountRaised > playersList.players[gameInfo.whoseTurn].money) {
+        if (amountToCall + amountRaised >= playersList.players[gameInfo.whoseTurn].money) {
             playersList.players[gameInfo.whoseTurn].allIn = true
         }
         
@@ -220,8 +243,7 @@ struct ActionsView: View {
                         .buttonStyle(.bordered)
                         
                         Stepper (value: $amountRaised,
-                                 in: gameInfo.minBet...(playersList.players[gameInfo.whoseTurn].money
-                                                        - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound))) {}
+                                 in: gameInfo.minBet...20){}
                         
                     }
                 }
@@ -283,3 +305,4 @@ struct ActionsView: View {
         }
     }
 }
+

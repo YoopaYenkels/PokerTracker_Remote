@@ -160,6 +160,7 @@ struct MainView: View {
             for i in 0...(playersList.players.count - 1) {
                 playersList.players[i].spentThisRound = 0
                 playersList.players[i].hasFolded = false
+                playersList.players[i].allIn = false
             }
         }
         
@@ -210,7 +211,7 @@ struct MainView: View {
                         Text("Highest Bet: \(gameInfo.highestBet)")
                         Text("current Pot: \(potList.currentPot)")
                         Text("Total Bets: \(potList.totalBets)")
-                        //                        Text("Whose Turn: \(playersList.players[gameInfo.whoseTurn].name)  \(gameInfo.whoseTurn)")
+                        Text("All in? \(playersList.players[gameInfo.whoseTurn].name) \(String(playersList.players[gameInfo.whoseTurn].allIn))")
                         //                        Text("Active Players: \(gameInfo.numActivePlayers)")
                     }
                     PotView()
