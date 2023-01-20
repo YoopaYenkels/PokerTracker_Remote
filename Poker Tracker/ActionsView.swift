@@ -12,8 +12,8 @@ struct PlacedBet : Equatable {
     var id: UUID
     var name: String
     var amount: Int
-    var playerFolded: Bool
     var allIn: Bool
+    var playerFolded: Bool
 }
 
 struct ActionsView: View {
@@ -32,50 +32,78 @@ struct ActionsView: View {
     var ApplyRoles: () -> Void
     var NewBettingRound: () -> Void
     
-    
     func CreatePots() {
         var placedBets: [PlacedBet] = []
         var newPotRequired: Bool = false
+        var leastIndex: Int = 0
+        var leastAllInAmount: Int = 0
         
         for i in 0...(playersList.players.count - 1) {
-            if (playersList.players[i].spentThisRound > 0) {
-                placedBets.append(PlacedBet(id: playersList.players[i].id,
-                                            name: playersList.players[i].name,
-                                            amount: playersList.players[i].spentThisRound,
-                                            playerFolded: playersList.players[i].hasFolded,
-                                            allIn: playersList.players[i].allIn))
-            }
+            placedBets.append(PlacedBet(id: playersList.players[i].id,
+                                        name: playersList.players[i].name,
+                                        amount: playersList.players[i].spentThisRound,
+                                        allIn: playersList.players[i].allIn,
+                                        playerFolded: playersList.players[i].hasFolded))
+            
         }
         placedBets.sort { $0.amount < $1.amount }
-
+        print(placedBets)
+        
         for i in 0...(placedBets.count - 1) {
-            if (placedBets[i].amount != 0 && !placedBets[i].playerFolded) {
-                var moneyToAdd = 0
-                let betToSubtract = placedBets[i].amount
-                for pos in 0...(placedBets.count - 1) {
-                    if (placedBets[pos].amount > 0) {
-                        placedBets[pos].amount -= betToSubtract
-                        moneyToAdd += betToSubtract
-                    }
-                }
-                             
-                if (newPotRequired) {
-                    print("pot \(potList.currentPot) is closed")
-                    potList.currentPot += 1
-                    potList.pots.append(Pot(name: "Side Pot \(potList.currentPot)",
-                                            money: 0))
-                }  
-                potList.pots[(potList.currentPot)].money += moneyToAdd
+            if (placedBets.allSatisfy({ ($0.amount == 0) })) { break }
+            
+            var moneyToAdd = 0
+            let betToSubtract = placedBets[i].amount
+          
+            // get smallest all-in bet, or smallest bet
+            if (placedBets.firstIndex(where: { $0.allIn && $0.amount > 0 }) == nil) {
+                leastIndex = placedBets.firstIndex(where: { $0.amount > 0 && !$0.playerFolded})!
+            }
+            else {
+                leastIndex = placedBets.firstIndex(where: { $0.allIn && $0.amount > 0 })!
             }
             
-            // create a side pot if someone's bet is all in and less than all the others
-            let firstNonZero = placedBets.first(where: { $0.amount != 0 })
-            newPotRequired = !placedBets.allSatisfy({ $0.amount == firstNonZero?.amount })
+            leastAllInAmount = placedBets[leastIndex].amount
+            print("Least amount: $\(leastAllInAmount) at pos \(leastIndex)")
+            
+            if (leastIndex > 0) {
+                newPotRequired = !placedBets[leastIndex...]
+                    .allSatisfy({ ($0.amount == leastAllInAmount) }) &&
+                placedBets[0...(leastIndex-1)]
+                    .allSatisfy({ ($0.amount == 0) })
+            }
+            else {
+                newPotRequired = !placedBets[leastIndex...]
+                    .allSatisfy({ ($0.amount == leastAllInAmount) })
+            }
+            
+            for pos in 0...(placedBets.count - 1) {
+                if (0 < placedBets[pos].amount &&
+                    placedBets[pos].amount < leastAllInAmount) {
+                    // for folded bets
+                    placedBets[i].amount -= betToSubtract
+                    moneyToAdd += betToSubtract
+                    break
+                }
+                else if (placedBets[pos].amount > 0) {
+                    placedBets[pos].amount -= betToSubtract
+                    moneyToAdd += betToSubtract
+                }
+            }
+            
+            potList.pots[(potList.currentPot)].money += moneyToAdd
+            print("i: \(i) | $\(moneyToAdd) added to pot \(potList.currentPot)")
+            
+            if (newPotRequired && i == leastIndex) {
+                print("pot \(potList.currentPot) is closed")
+                potList.currentPot += 1
+                potList.pots.append(Pot(name: "Side Pot \(potList.currentPot)",
+                                        money: 0))
+            }
+            
             print(placedBets)
-        }
-//                else if (placedBets[i].playerFolded && placedBets[i].amount > 0) {
-//                    potList.pots[potList.currentPot].money += placedBets[pos].amount
-//                }
+            
+        }   
     }
     
     func CheckEqualBets() {

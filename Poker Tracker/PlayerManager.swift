@@ -82,16 +82,16 @@ struct Player: Identifiable {
 
 class PlayersList: ObservableObject {
     @Published var players: [Player] = [
-        Player(name: "Alice", money: 3),
-        Player(name: "Bob", money:  5),
-        Player(name: "Chaz", money: 8),
-        Player(name: "Dave", money: 20)
-//        Player(name: "Emma"),
-//        Player(name: "Fred")
-//        Player(name: "Gwen"),
-//        Player(name: "Hera")
-//        Player(name: "Iola"),
-//        Player(name: "Jeff")
+        Player(name: "Alice", money: 8),
+        Player(name: "Bob", money:  12),
+        Player(name: "Chaz", money: 22),
+        Player(name: "Dave", money: 12),
+        Player(name: "Emma", money: 12)
+//        Player(name: "Fred", money: 12),
+//        Player(name: "Gwen", money: 12),
+//        Player(name: "Hera", money: 12)
+//        Player(name: "Iola", money: 12),
+//        Player(name: "Jeff", money: 12)
     ]
     
     func deletePlayer(index: IndexSet) {

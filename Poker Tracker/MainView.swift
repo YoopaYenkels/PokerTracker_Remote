@@ -191,7 +191,7 @@ struct MainView: View {
                     playersList.players[i].money -= gameInfo.minBet
                     playersList.players[i].spentThisRound += gameInfo.minBet
                     potList.totalBets += gameInfo.minBet
-                default: ()
+                default: ()    
                 }
             }
         }
