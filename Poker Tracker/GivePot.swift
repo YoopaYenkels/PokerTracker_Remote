@@ -15,36 +15,42 @@ struct GivePot: View {
     @EnvironmentObject var gameInfo: GameInfo
     @EnvironmentObject var potList: PotList
     
-    @State private var selection = Set<UUID>()
+    @State var selection = Set<UUID>()
     
     func AwardPot() {
         for i in 0...(playersList.players.count - 1) {
             if (selection.contains(playersList.players[i].id)) {
-                playersList.players[i].money += potList.pots[0].money/selection.count
+                playersList.players[i].money += potList.pots[potList.currentPot].money/selection.count
             }
         }
-        potList.pots[0].money = 0
-        gameInfo.potGiven = true
-        
-        dismiss()
+
+        if (potList.currentPot > 0) {
+            //potList.pots.remove(at: potList.currentPot)
+            potList.pots[potList.currentPot].money = 0
+            potList.currentPot -= 1
+            dismiss()
+        } else {
+            potList.pots[potList.currentPot].money = 0
+            potList.pots[potList.currentPot].canBeWonBy.removeAll()
+            gameInfo.potGiven = true
+        }
+       
     }
     
     var body: some View {
         NavigationStack {
             VStack {
-                Text("Select the winning player(s):")
+                Text( "Select the winning player(s) for \(potList.currentPot == 0 ? "the Main Pot:" : "Side Pot \(potList.currentPot):") ")
                     .fontWeight(.bold)
                 
-                List (playersList.players, selection: $selection) {
-                    if (!$0.hasFolded) {
-                        Text($0.name)
-                    }
+                List (potList.pots[potList.currentPot].canBeWonBy, selection: $selection) {
+                    Text($0.name)
                 }
                 .scrollContentBackground(.hidden)
                 .background(.white)
                 
                 
-                Button ("Award Pot", action: AwardPot)
+                Button (potList.currentPot == 0 ? "Award Main Pot" : "Award Side Pot \(potList.currentPot)", action: AwardPot)
                     .buttonStyle(.borderedProminent)
                 
                 .toolbar {

@@ -11,6 +11,7 @@ import SwiftUI
 struct BottomBarView:View {
     @EnvironmentObject var playersList: PlayersList
     @EnvironmentObject var gameInfo: GameInfo
+    @EnvironmentObject var potList: PotList
     
     @State private var showActions = false
     @State private var showRaise = false
@@ -30,11 +31,12 @@ struct BottomBarView:View {
                 if (gameInfo.betState == .blinds) {
                     Button {
                         self.NewHand()
-                        self.AddBlinds()
+                        self.AddBlinds() 
                     } label: {
                         Text("Begin Hand")
                     }
                     .buttonStyle(.borderedProminent)
+                    
                 } else if (!gameInfo.betsEqualized && gameInfo.bettingRound < 3) {
                     Button {
                         showActions.toggle()

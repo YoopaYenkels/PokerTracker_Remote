@@ -65,7 +65,7 @@ struct PlayerManager: View {
     }
 }
 
-struct Player: Identifiable {
+struct Player: Identifiable, Equatable {
     var id = UUID()
     var name: String = ""
     
@@ -82,11 +82,11 @@ struct Player: Identifiable {
 
 class PlayersList: ObservableObject {
     @Published var players: [Player] = [
-        Player(name: "Alice", money: 8),
-        Player(name: "Bob", money:  12),
-        Player(name: "Chaz", money: 22),
-        Player(name: "Dave", money: 12),
-        Player(name: "Emma", money: 12)
+        Player(name: "Alice", money: 10),
+        Player(name: "Bob", money:  6),
+        Player(name: "Chaz", money: 20),
+        Player(name: "Dave", money: 20),
+        Player(name: "Emma", money: 4)
 //        Player(name: "Fred", money: 12),
 //        Player(name: "Gwen", money: 12),
 //        Player(name: "Hera", money: 12)

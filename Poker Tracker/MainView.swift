@@ -19,13 +19,13 @@ class GameInfo: ObservableObject {
     @Published var whoIsDealer = 0
     @Published var whoseTurn: Int = 3
     var sbPos: Int = 1
-    
+     
     var potGiven = false
     
     // change in settings
     @State var minBet = 2
     
-    //highest bet in this betting round
+    //highest bet in this betting round  
     var highestBet = 0
     
     @Published var betState: BetState = .blinds
@@ -39,7 +39,7 @@ class GameInfo: ObservableObject {
 }
 
 struct MainView: View {
-    @EnvironmentObject var playersList: PlayersList
+    @EnvironmentObject var playersList: PlayersList    
     @EnvironmentObject var gameInfo: GameInfo
     @EnvironmentObject var potList: PotList
     
@@ -111,7 +111,7 @@ struct MainView: View {
         }
         
         for i in (0...playersList.players.count) {
-            if (!playersList.players[i].hasFolded)  {
+            if (!playersList.players[i].hasFolded) {
                 gameInfo.sbPos = i
                 gameInfo.whoseTurn = gameInfo.sbPos
                 return
@@ -154,7 +154,6 @@ struct MainView: View {
         gameInfo.betsEqualized = false
         gameInfo.numActivePlayers = playersList.players.count
         
-        potList.currentPot = 0
         
         if (playersList.players.count > 1) {
             for i in 0...(playersList.players.count - 1) {
@@ -191,7 +190,7 @@ struct MainView: View {
                     playersList.players[i].money -= gameInfo.minBet
                     playersList.players[i].spentThisRound += gameInfo.minBet
                     potList.totalBets += gameInfo.minBet
-                default: ()    
+                default: ()
                 }
             }
         }
@@ -207,19 +206,17 @@ struct MainView: View {
                 VStack {
                     VStack (alignment: .leading) {
                         
-                        Text("Num Checks: \(gameInfo.numChecks)")
-                        Text("Highest Bet: \(gameInfo.highestBet)")
-                        Text("current Pot: \(potList.currentPot)")
-                        Text("Total Bets: \(potList.totalBets)")
-                        Text("All in? \(playersList.players[gameInfo.whoseTurn].name) \(String(playersList.players[gameInfo.whoseTurn].allIn))")
+//                        Text("Num Checks: \(gameInfo.numChecks)")
+//                        Text("Highest Bet: \(gameInfo.highestBet)")
+//                        Text("current Pot: \(potList.currentPot)")
+//                        Text("Total Bets: \(potList.totalBets)")
+//                        Text("All in? \(playersList.players[gameInfo.whoseTurn].name) \(String(playersList.players[gameInfo.whoseTurn].allIn))")
                         //                        Text("Active Players: \(gameInfo.numActivePlayers)")
                     }
                     PotView()
-                    
-                    Text("Round: \(gameInfo.betState.rawValue) \(gameInfo.bettingRound)")
-                    
+                    Text("Round: \(gameInfo.betState.rawValue) \(gameInfo.bettingRound + 1)")
                     Text("Num Raises: \(gameInfo.numRaises)")
-                    
+                
                     PlayersView()
                     Divider()
                     BottomBarView(AddBlinds: self.AddBlinds,

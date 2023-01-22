@@ -34,9 +34,9 @@ struct ActionsView: View {
     
     func CreatePots() {
         var placedBets: [PlacedBet] = []
-        var newPotRequired: Bool = false
         var leastIndex: Int = 0
-        var leastAllInAmount: Int = 0
+        var leastAmount: Int = 0
+        var skipToNext: Bool = false
         
         for i in 0...(playersList.players.count - 1) {
             placedBets.append(PlacedBet(id: playersList.players[i].id,
@@ -49,61 +49,110 @@ struct ActionsView: View {
         placedBets.sort { $0.amount < $1.amount }
         print(placedBets)
         
-        for i in 0...(placedBets.count - 1) {
-            if (placedBets.allSatisfy({ ($0.amount == 0) })) { break }
+        if (placedBets.firstIndex(where: { $0.allIn && $0.amount == 0 }) != nil) {
+            potList.pots.append(Pot(name: "Side Pot \(potList.currentPot + 1)",
+                                    money: 0))
+            potList.currentPot += 1
+        }
+        
+        while (!placedBets.allSatisfy({ ($0.amount == 0) })) {
+            skipToNext = false
             
-            var moneyToAdd = 0
-            let betToSubtract = placedBets[i].amount
-          
-            // get smallest all-in bet, or smallest bet
-            if (placedBets.firstIndex(where: { $0.allIn && $0.amount > 0 }) == nil) {
+            if (placedBets.firstIndex(where: { $0.allIn && $0.amount > 0 }) != nil) {
+                leastIndex = placedBets.firstIndex(where: { $0.allIn && $0.amount > 0 })!
+            } else {
                 leastIndex = placedBets.firstIndex(where: { $0.amount > 0 && !$0.playerFolded})!
             }
-            else {
-                leastIndex = placedBets.firstIndex(where: { $0.allIn && $0.amount > 0 })!
-            }
             
-            leastAllInAmount = placedBets[leastIndex].amount
-            print("Least amount: $\(leastAllInAmount) at pos \(leastIndex)")
-            
-            if (leastIndex > 0) {
-                newPotRequired = !placedBets[leastIndex...]
-                    .allSatisfy({ ($0.amount == leastAllInAmount) }) &&
-                placedBets[0...(leastIndex-1)]
-                    .allSatisfy({ ($0.amount == 0) })
-            }
-            else {
-                newPotRequired = !placedBets[leastIndex...]
-                    .allSatisfy({ ($0.amount == leastAllInAmount) })
-            }
-            
-            for pos in 0...(placedBets.count - 1) {
-                if (0 < placedBets[pos].amount &&
-                    placedBets[pos].amount < leastAllInAmount) {
-                    // for folded bets
-                    placedBets[i].amount -= betToSubtract
-                    moneyToAdd += betToSubtract
+            leastAmount = placedBets[leastIndex].amount
+            print("least amount: \(leastAmount) at pos \(leastIndex)")
+            for i in 0...(placedBets.count - 1) {
+                if (0 < placedBets[i].amount &&
+                    placedBets[i].amount < leastAmount) {
+                    potList.pots[(potList.currentPot)].money += placedBets[i].amount
+                    placedBets[i].amount = 0
+                    skipToNext = true
                     break
                 }
-                else if (placedBets[pos].amount > 0) {
-                    placedBets[pos].amount -= betToSubtract
-                    moneyToAdd += betToSubtract
+                else if (placedBets[i].amount > 0) {
+                    placedBets[i].amount -= leastAmount
+                    potList.pots[(potList.currentPot)].money += leastAmount
+                    
+                if (!potList.pots[(potList.currentPot)].canBeWonBy
+                    .contains(where: { $0.id == placedBets[i].id }) && !placedBets[i].playerFolded) {
+                                       potList.pots[(potList.currentPot)].canBeWonBy
+                                           .append(playersList.players.first(where: { $0.id == placedBets[i].id })!)
+                                   }
+                               
                 }
             }
-            
-            potList.pots[(potList.currentPot)].money += moneyToAdd
-            print("i: \(i) | $\(moneyToAdd) added to pot \(potList.currentPot)")
-            
-            if (newPotRequired && i == leastIndex) {
-                print("pot \(potList.currentPot) is closed")
-                potList.currentPot += 1
-                potList.pots.append(Pot(name: "Side Pot \(potList.currentPot)",
-                                        money: 0))
-            }
-            
             print(placedBets)
-            
-        }   
+
+            if (!placedBets.allSatisfy({ ($0.amount == 0) }) && !skipToNext) {
+                potList.pots.append(Pot(name: "Side Pot \(potList.currentPot + 1)",
+                                        money: 0))
+                potList.currentPot += 1
+            }
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        //        for i in 0...(placedBets.count - 1) {
+        //            if (placedBets.allSatisfy({ ($0.amount == 0) })) { break }
+        //
+        //            var moneyToAdd = 0
+        //            let betToSubtract = placedBets[i].amount
+        //
+        //            // get smallest all-in bet, or smallest bet
+        //            if (placedBets.firstIndex(where: { $0.allIn && $0.amount > 0 }) == nil) {
+        //                leastIndex = placedBets.firstIndex(where: { $0.amount > 0 && !$0.playerFolded})!
+        //            } else {
+        //                leastIndex = placedBets.firstIndex(where: { $0.allIn && $0.amount > 0 })!
+        //            }
+        //
+        //            leastAllInAmount = placedBets[leastIndex].amount
+        //            print("least amount: $\(leastAllInAmount) at pos \(leastIndex)")
+        //
+        //            newPotRequired = !placedBets[leastIndex...]
+        //                .allSatisfy({ ($0.amount == leastAllInAmount) }) &&
+        //            (leastIndex > 0 ? placedBets[0...(leastIndex-1)]
+        //                .allSatisfy({ $0.amount == 0 }) : true)
+        //
+        //            for pos in 0...(placedBets.count - 1) {
+        //                if (0 < placedBets[pos].amount &&
+        //                    placedBets[pos].amount < leastAllInAmount) {
+        //                    // for folded bets
+        //                    placedBets[i].amount -= betToSubtract
+        //                    moneyToAdd += betToSubtract
+        //                    break
+        //                }
+        //                else if (placedBets[pos].amount > 0) {
+        //                    placedBets[pos].amount -= betToSubtract
+        //                    moneyToAdd += betToSubtract
+        //
+        //                    if (!potList.pots[(potList.currentPot)].canBeWonBy.contains(where: { $0.id == placedBets[pos].id }) &&
+        //                        !placedBets[pos].playerFolded) {
+        //                        potList.pots[(potList.currentPot)].canBeWonBy
+        //                            .append(playersList.players.first(where: { $0.id == placedBets[pos].id })!)
+        //                    }
+        //                }
+        //            }
+        //            print(placedBets)
+        //            potList.pots[(potList.currentPot)].money += moneyToAdd
+        //
+        //            if (newPotRequired && i == leastIndex) {
+        //                potList.currentPot += 1
+        //                potList.pots.append(Pot(name: "Side Pot \(potList.currentPot)",
+        //                                        money: 0))
+        //            }
+        //        }
     }
     
     func CheckEqualBets() {
@@ -135,6 +184,7 @@ struct ActionsView: View {
     
     func Call() {
         var amountToCall = 0
+        showRaise = false
         
         if ((gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)
             < playersList.players[gameInfo.whoseTurn].money) {
@@ -150,7 +200,7 @@ struct ActionsView: View {
         potList.totalBets += amountToCall
         
         playersList.players[gameInfo.whoseTurn].hasPlayed = true
-        showRaise = false
+        
         CheckEqualBets()
     }
     
@@ -162,7 +212,7 @@ struct ActionsView: View {
     }
     
     func ShowRaise() {
-        if ((gameInfo.minBet <= playersList.players[gameInfo.whoseTurn].money - gameInfo.highestBet)
+        if ((gameInfo.minBet <= playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound))
             && (gameInfo.numRaises < 3 ||
                 playersList.players.count == 2)) {
             showRaise = true
@@ -199,6 +249,14 @@ struct ActionsView: View {
         playersList.players[gameInfo.whoseTurn].hasFolded = true
         gameInfo.numActivePlayers -= 1
         
+        
+        for i in 0...(potList.pots.count - 1) {
+            if let index = potList.pots[i].canBeWonBy
+                .firstIndex(where: { $0.id == playersList.players[gameInfo.whoseTurn].id }) {
+                potList.pots[i].canBeWonBy.remove(at: index)
+            }
+            
+        }
         CheckEqualBets()
     }
     
@@ -224,8 +282,6 @@ struct ActionsView: View {
                     //                                        totalMoney: playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound) - amountRaised)
                     //                    }
                 }
-                
-                Spacer()
                 
                 if ((gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound == 0) ||
                     playersList.players[gameInfo.whoseTurn].allIn) {
@@ -270,8 +326,13 @@ struct ActionsView: View {
                         }
                         .buttonStyle(.bordered)
                         
+                        VStack{
+                            Text("Min Bet: \(gameInfo.minBet)")
+                            Text("Max Raise: \(playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound))")
+                        }
+                        
                         Stepper (value: $amountRaised,
-                                 in: gameInfo.minBet...20){}
+                                 in: (playersList.players[gameInfo.whoseTurn].allIn ? 0...0 : gameInfo.minBet...playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound))) {}
                         
                     }
                 }
