@@ -216,7 +216,7 @@ struct MainView: View {
                     PotView()
                     Text("Round: \(gameInfo.betState.rawValue) \(gameInfo.bettingRound + 1)")
                     Text("Num Raises: \(gameInfo.numRaises)")
-                
+                    
                     PlayersView()
                     Divider()
                     BottomBarView(AddBlinds: self.AddBlinds,

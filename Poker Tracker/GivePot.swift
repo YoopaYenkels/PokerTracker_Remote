@@ -24,17 +24,16 @@ struct GivePot: View {
             }
         }
 
+        
         if (potList.currentPot > 0) {
-            //potList.pots.remove(at: potList.currentPot)
-            potList.pots[potList.currentPot].money = 0
+            potList.pots.remove(at: potList.currentPot)
             potList.currentPot -= 1
-            dismiss()
         } else {
             potList.pots[potList.currentPot].money = 0
             potList.pots[potList.currentPot].canBeWonBy.removeAll()
             gameInfo.potGiven = true
         }
-       
+        dismiss()
     }
     
     var body: some View {
@@ -50,8 +49,13 @@ struct GivePot: View {
                 .background(.white)
                 
                 
-                Button (potList.currentPot == 0 ? "Award Main Pot" : "Award Side Pot \(potList.currentPot)", action: AwardPot)
-                    .buttonStyle(.borderedProminent)
+                Button {
+                    AwardPot()
+                } label: {
+                 Label(potList.currentPot == 0 ? "Award Main Pot" : "Award Side Pot \(potList.currentPot)",
+                 systemImage: "trophy")
+                }
+                .buttonStyle(.borderedProminent)
                 
                 .toolbar {
                     EditButton()

@@ -8,17 +8,11 @@
 import Foundation
 import SwiftUI
 
-class Pot: Identifiable, ObservableObject {
+struct Pot: Identifiable {
     var id = UUID()
     var name: String = ""
-    @Published var money: Int = 0
-    @Published var canBeWonBy: [Player] = []
-    
-    init(name: String, money: Int) {
-        self.name = name
-        self.money = money
-        self.canBeWonBy = canBeWonBy
-    }
+    var money: Int = 0
+    var canBeWonBy: [Player] = []
 }
 
 class PotList: ObservableObject {
@@ -62,7 +56,6 @@ struct PotView: View {
             Divider()
                 .frame(width: 300, height: 4)
                 .overlay(.black)
-            
             
             ForEach(potList.pots) { pot in
                 VStack{

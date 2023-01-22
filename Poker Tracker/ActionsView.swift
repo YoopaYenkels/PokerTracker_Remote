@@ -36,7 +36,7 @@ struct ActionsView: View {
         var placedBets: [PlacedBet] = []
         var leastIndex: Int = 0
         var leastAmount: Int = 0
-        var skipToNext: Bool = false
+        var stillAddingToCurrentPot: Bool = false
         
         for i in 0...(playersList.players.count - 1) {
             placedBets.append(PlacedBet(id: playersList.players[i].id,
@@ -47,16 +47,20 @@ struct ActionsView: View {
             
         }
         placedBets.sort { $0.amount < $1.amount }
-        print(placedBets)
         
-        if (placedBets.firstIndex(where: { $0.allIn && $0.amount == 0 }) != nil) {
-            potList.pots.append(Pot(name: "Side Pot \(potList.currentPot + 1)",
-                                    money: 0))
-            potList.currentPot += 1
+        for i in 0...(placedBets.count - 1) {
+            let player = playersList.players.first(where: { $0.id == placedBets[i].id })
+            if ( !placedBets.allSatisfy({ ($0.amount == 0) }) &&
+                 placedBets[i].allIn && placedBets[i].amount == 0 &&
+                 potList.pots[potList.currentPot].canBeWonBy.contains(where: { $0.id == player!.id })) {
+                potList.pots.append(Pot(name: "Side Pot \(potList.currentPot + 1)", money: 0))
+                potList.currentPot += 1
+                break
+            }
         }
         
         while (!placedBets.allSatisfy({ ($0.amount == 0) })) {
-            skipToNext = false
+            stillAddingToCurrentPot = false
             
             if (placedBets.firstIndex(where: { $0.allIn && $0.amount > 0 }) != nil) {
                 leastIndex = placedBets.firstIndex(where: { $0.allIn && $0.amount > 0 })!
@@ -69,40 +73,29 @@ struct ActionsView: View {
             for i in 0...(placedBets.count - 1) {
                 if (0 < placedBets[i].amount &&
                     placedBets[i].amount < leastAmount) {
-                    potList.pots[(potList.currentPot)].money += placedBets[i].amount
+                    potList.pots[potList.currentPot].money += placedBets[i].amount
                     placedBets[i].amount = 0
-                    skipToNext = true
+                    stillAddingToCurrentPot = true
                     break
-                }
-                else if (placedBets[i].amount > 0) {
+                } else if (placedBets[i].amount > 0) {
                     placedBets[i].amount -= leastAmount
-                    potList.pots[(potList.currentPot)].money += leastAmount
+                    potList.pots[potList.currentPot].money += leastAmount
                     
-                if (!potList.pots[(potList.currentPot)].canBeWonBy
-                    .contains(where: { $0.id == placedBets[i].id }) && !placedBets[i].playerFolded) {
-                                       potList.pots[(potList.currentPot)].canBeWonBy
-                                           .append(playersList.players.first(where: { $0.id == placedBets[i].id })!)
-                                   }
-                               
+                    if (!potList.pots[potList.currentPot].canBeWonBy
+                        .contains(where: { $0.id == placedBets[i].id }) && !placedBets[i].playerFolded) {
+                        potList.pots[potList.currentPot].canBeWonBy
+                            .append(playersList.players.first(where: { $0.id == placedBets[i].id })!)
+                    }
                 }
             }
-            print(placedBets)
-
-            if (!placedBets.allSatisfy({ ($0.amount == 0) }) && !skipToNext) {
+            
+            if (!placedBets.allSatisfy({ ($0.amount == 0) }) && !stillAddingToCurrentPot) {
                 potList.pots.append(Pot(name: "Side Pot \(potList.currentPot + 1)",
                                         money: 0))
                 potList.currentPot += 1
             }
         }
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
         
         //        for i in 0...(placedBets.count - 1) {
         //            if (placedBets.allSatisfy({ ($0.amount == 0) })) { break }

@@ -83,7 +83,7 @@ struct Player: Identifiable, Equatable {
 class PlayersList: ObservableObject {
     @Published var players: [Player] = [
         Player(name: "Alice", money: 10),
-        Player(name: "Bob", money:  6),
+        Player(name: "Bob", money:  10),
         Player(name: "Chaz", money: 20),
         Player(name: "Dave", money: 20),
         Player(name: "Emma", money: 4)
@@ -106,15 +106,19 @@ class PlayersList: ObservableObject {
 struct PlayerRowView: View {
     var player: Player
     var body: some View {
-        HStack {
-            Text(player.name)
-                .font(.system(size: 20, weight: .regular))
+        NavigationLink {} label: {
+            HStack {
+                Text(player.name)
+                    .font(.system(size: 20, weight: .regular))
+                    .foregroundColor(.black)
+                
+                Spacer()
+                
+                Label("\(player.money)", systemImage: "dollarsign.circle")
+                    .foregroundColor(.secondary)
+                    .font(.system(size: 20, weight: .light))
+            }
             
-            Spacer()
-            
-            Label("\(player.money)", systemImage: "dollarsign.circle")
-                .foregroundColor(.secondary)
-                .font(.system(size: 20, weight: .light))
         }
     }
 }
