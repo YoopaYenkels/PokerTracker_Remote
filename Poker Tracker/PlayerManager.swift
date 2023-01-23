@@ -83,10 +83,10 @@ struct Player: Identifiable, Equatable {
 class PlayersList: ObservableObject {
     @Published var players: [Player] = [
         Player(name: "Alice", money: 10),
-        Player(name: "Bob", money:  10),
-        Player(name: "Chaz", money: 20),
-        Player(name: "Dave", money: 20),
-        Player(name: "Emma", money: 4)
+        Player(name: "Bob", money:  20),
+        Player(name: "Chaz", money: 30),
+        Player(name: "Dave", money: 40),
+        Player(name: "Emma", money: 50)
 //        Player(name: "Fred", money: 12),
 //        Player(name: "Gwen", money: 12),
 //        Player(name: "Hera", money: 12)

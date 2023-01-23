@@ -7,10 +7,6 @@
 
 import SwiftUI
 
-enum BetState : String {
-    case blinds, preflop, regular
-}
-
 enum PlayerRole : Int {
     case Dealer, SmallBlind, BigBlind, None
 }
@@ -19,16 +15,15 @@ class GameInfo: ObservableObject {
     @Published var whoIsDealer = 0
     @Published var whoseTurn: Int = 3
     var sbPos: Int = 1
-     
+    
     var potGiven = false
     
     // change in settings
     @State var minBet = 2
     
-    //highest bet in this betting round  
+    //highest bet in this betting round
     var highestBet = 0
     
-    @Published var betState: BetState = .blinds
     var betsEqualized: Bool = false
     var bettingRound: Int = 0
     
@@ -39,7 +34,7 @@ class GameInfo: ObservableObject {
 }
 
 struct MainView: View {
-    @EnvironmentObject var playersList: PlayersList    
+    @EnvironmentObject var playersList: PlayersList
     @EnvironmentObject var gameInfo: GameInfo
     @EnvironmentObject var potList: PotList
     
@@ -74,8 +69,6 @@ struct MainView: View {
     }
     
     func NewBettingRound() {
-        if (gameInfo.betState == .preflop) {gameInfo.betState = .regular}
-        
         gameInfo.bettingRound += 1
         gameInfo.numChecks = 0
         gameInfo.numRaises = 0
@@ -105,7 +98,7 @@ struct MainView: View {
                 if (!playersList.players[gameInfo.sbPos + i].hasFolded)  {
                     gameInfo.sbPos += i
                     gameInfo.whoseTurn = gameInfo.sbPos
-                    return  
+                    return
                 }
             }
         }
@@ -149,7 +142,6 @@ struct MainView: View {
     
     func NewHand() {
         gameInfo.potGiven = false
-        gameInfo.betState = .blinds
         gameInfo.bettingRound = 0
         gameInfo.betsEqualized = false
         gameInfo.numActivePlayers = playersList.players.count
@@ -195,30 +187,31 @@ struct MainView: View {
             }
         }
         
-        gameInfo.betState = .preflop
+        gameInfo.bettingRound += 1
         gameInfo.highestBet = gameInfo.minBet
+        
     }
+    
     
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(.white).ignoresSafeArea()
+                LinearGradient(colors: [Color("bgColor1"), Color("bgColor2")], startPoint: .leading, endPoint: .trailing)
+                    .ignoresSafeArea()
                 VStack {
-                    VStack (alignment: .leading) {
-                        
-//                        Text("Num Checks: \(gameInfo.numChecks)")
-//                        Text("Highest Bet: \(gameInfo.highestBet)")
-//                        Text("current Pot: \(potList.currentPot)")
-//                        Text("Total Bets: \(potList.totalBets)")
-//                        Text("All in? \(playersList.players[gameInfo.whoseTurn].name) \(String(playersList.players[gameInfo.whoseTurn].allIn))")
-                        //                        Text("Active Players: \(gameInfo.numActivePlayers)")
-                    }
                     PotView()
-                    Text("Round: \(gameInfo.betState.rawValue) \(gameInfo.bettingRound + 1)")
-                    Text("Num Raises: \(gameInfo.numRaises)")
+                   
+                    switch (gameInfo.bettingRound) {
+                        case 1: Text("Round: Preflop")
+                        case 2: Text("Round: Flop")
+                        case 3: Text("Round: Turn")
+                        case 4: Text("Round: River")
+                        default: Text("Round: Blinds")  
+                    }
+
                     
                     PlayersView()
-                    Divider()
+                    Spacer()
                     BottomBarView(AddBlinds: self.AddBlinds,
                                   NewHand: self.NewHand,
                                   UpdateTurn: self.UpdateTurn,
@@ -246,6 +239,7 @@ struct MainView: View {
                     
                 }
                 .onAppear(perform: ApplyRoles)
+              
             }
         }
     }

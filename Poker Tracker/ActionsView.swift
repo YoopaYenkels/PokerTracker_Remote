@@ -53,8 +53,10 @@ struct ActionsView: View {
             if ( !placedBets.allSatisfy({ ($0.amount == 0) }) &&
                  placedBets[i].allIn && placedBets[i].amount == 0 &&
                  potList.pots[potList.currentPot].canBeWonBy.contains(where: { $0.id == player!.id })) {
+                potList.pots[potList.currentPot].isOpen = false
                 potList.pots.append(Pot(name: "Side Pot \(potList.currentPot + 1)", money: 0))
                 potList.currentPot += 1
+                potList.pots[potList.currentPot].isOpen = true
                 break
             }
         }
@@ -69,7 +71,6 @@ struct ActionsView: View {
             }
             
             leastAmount = placedBets[leastIndex].amount
-            print("least amount: \(leastAmount) at pos \(leastIndex)")
             for i in 0...(placedBets.count - 1) {
                 if (0 < placedBets[i].amount &&
                     placedBets[i].amount < leastAmount) {
@@ -90,9 +91,11 @@ struct ActionsView: View {
             }
             
             if (!placedBets.allSatisfy({ ($0.amount == 0) }) && !stillAddingToCurrentPot) {
+                potList.pots[potList.currentPot].isOpen = false
                 potList.pots.append(Pot(name: "Side Pot \(potList.currentPot + 1)",
                                         money: 0))
                 potList.currentPot += 1
+                potList.pots[potList.currentPot].isOpen = true
             }
         }
 
