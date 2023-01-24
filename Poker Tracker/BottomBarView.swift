@@ -43,14 +43,14 @@ struct BottomBarView:View {
                     } label: {
                         Text("\(playersList.players[gameInfo.whoseTurn].name)'s Turn")
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(.borderedProminent)
                     .sheet(isPresented: $showActions) {
                         ActionsView(showRaise: $showRaise,
                                     amountRaised: $amountRaised,
                                     UpdateTurn: UpdateTurn,
                                     ApplyRoles: ApplyRoles,
                                     NewBettingRound: NewBettingRound)
-                        .presentationDetents([.medium])
+                        .presentationDetents([.fraction(0.2)])
                     }.onDisappear(perform: {
                         amountRaised = gameInfo.minBet
                     })
@@ -69,17 +69,5 @@ struct BottomBarView:View {
                 }
             }
         }
-    }
-}
-
-
-
-struct ActionButton: View {
-    var text: String
-    
-    var body: some View {
-        Button(text, action: {})
-            .foregroundColor(.white)
-            .frame(width: 100, height: 50)
     }
 }

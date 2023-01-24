@@ -198,17 +198,18 @@ struct MainView: View {
             ZStack {
                 LinearGradient(colors: [Color("bgColor1"), Color("bgColor2")], startPoint: .leading, endPoint: .trailing)
                     .ignoresSafeArea()
+             
                 VStack {
                     PotView()
-                   
+                    
                     switch (gameInfo.bettingRound) {
-                        case 1: Text("Round: Preflop")
-                        case 2: Text("Round: Flop")
-                        case 3: Text("Round: Turn")
-                        case 4: Text("Round: River")
-                        default: Text("Round: Blinds")  
+                    case 1: Text("Round: Preflop")
+                    case 2: Text("Round: Flop")
+                    case 3: Text("Round: Turn")
+                    case 4: Text("Round: River")
+                    default: Text("Round: Blinds")
                     }
-
+                    
                     
                     PlayersView()
                     Spacer()
@@ -217,39 +218,43 @@ struct MainView: View {
                                   UpdateTurn: self.UpdateTurn,
                                   ApplyRoles: self.ApplyRoles,
                                   NewBettingRound: self.NewBettingRound)
-                }
-                .navigationTitle("Poker Tracker")
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading){
-                        NavigationLink (destination: PlayerManager()) {
-                            Image(systemName: "person.badge.plus")
-                                .imageScale(.large)
+                    //                }
+                    .navigationTitle("Poker Tracker")
+                    //.navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading){
+                            NavigationLink (destination: PlayerManager()) {
+                                Image(systemName: "person.badge.plus")
+                                    .imageScale(.large)
+                                    .foregroundColor(.white)
+                            }
                         }
-                    }
-                    
-                    
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button {
-                            UpdateDealer()
-                            NewHand()
-                        } label:{
-                            Image(systemName: "digitalcrown.horizontal.arrow.counterclockwise")
+                        
+                        
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button {
+                                UpdateDealer()
+                                NewHand()
+                            } label:{
+                                Image(systemName: "digitalcrown.horizontal.arrow.counterclockwise")
+                                    .foregroundColor(.white)
+                            }
                         }
+                        
                     }
-                    
+                    .onAppear(perform: ApplyRoles)
+                   
                 }
-                .onAppear(perform: ApplyRoles)
-              
             }
         }
     }
-}
-
-struct MainView_Previews: PreviewProvider {
-    static var previews: some View {
-        MainView()
-            .environmentObject(GameInfo())
-            .environmentObject(PlayersList())
-            .environmentObject(PotList())
+    
+    struct MainView_Previews: PreviewProvider {
+        static var previews: some View {
+            MainView()
+                .environmentObject(GameInfo())
+                .environmentObject(PlayersList())
+                .environmentObject(PotList())
+        }
     }
 }

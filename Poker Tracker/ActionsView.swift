@@ -32,6 +32,7 @@ struct ActionsView: View {
     var ApplyRoles: () -> Void
     var NewBettingRound: () -> Void
     
+    
     func CreatePots() {
         var placedBets: [PlacedBet] = []
         var leastIndex: Int = 0
@@ -98,57 +99,6 @@ struct ActionsView: View {
                 potList.pots[potList.currentPot].isOpen = true
             }
         }
-
-        
-        //        for i in 0...(placedBets.count - 1) {
-        //            if (placedBets.allSatisfy({ ($0.amount == 0) })) { break }
-        //
-        //            var moneyToAdd = 0
-        //            let betToSubtract = placedBets[i].amount
-        //
-        //            // get smallest all-in bet, or smallest bet
-        //            if (placedBets.firstIndex(where: { $0.allIn && $0.amount > 0 }) == nil) {
-        //                leastIndex = placedBets.firstIndex(where: { $0.amount > 0 && !$0.playerFolded})!
-        //            } else {
-        //                leastIndex = placedBets.firstIndex(where: { $0.allIn && $0.amount > 0 })!
-        //            }
-        //
-        //            leastAllInAmount = placedBets[leastIndex].amount
-        //            print("least amount: $\(leastAllInAmount) at pos \(leastIndex)")
-        //
-        //            newPotRequired = !placedBets[leastIndex...]
-        //                .allSatisfy({ ($0.amount == leastAllInAmount) }) &&
-        //            (leastIndex > 0 ? placedBets[0...(leastIndex-1)]
-        //                .allSatisfy({ $0.amount == 0 }) : true)
-        //
-        //            for pos in 0...(placedBets.count - 1) {
-        //                if (0 < placedBets[pos].amount &&
-        //                    placedBets[pos].amount < leastAllInAmount) {
-        //                    // for folded bets
-        //                    placedBets[i].amount -= betToSubtract
-        //                    moneyToAdd += betToSubtract
-        //                    break
-        //                }
-        //                else if (placedBets[pos].amount > 0) {
-        //                    placedBets[pos].amount -= betToSubtract
-        //                    moneyToAdd += betToSubtract
-        //
-        //                    if (!potList.pots[(potList.currentPot)].canBeWonBy.contains(where: { $0.id == placedBets[pos].id }) &&
-        //                        !placedBets[pos].playerFolded) {
-        //                        potList.pots[(potList.currentPot)].canBeWonBy
-        //                            .append(playersList.players.first(where: { $0.id == placedBets[pos].id })!)
-        //                    }
-        //                }
-        //            }
-        //            print(placedBets)
-        //            potList.pots[(potList.currentPot)].money += moneyToAdd
-        //
-        //            if (newPotRequired && i == leastIndex) {
-        //                potList.currentPot += 1
-        //                potList.pots.append(Pot(name: "Side Pot \(potList.currentPot)",
-        //                                        money: 0))
-        //            }
-        //        }
     }
     
     func CheckEqualBets() {
@@ -178,6 +128,7 @@ struct ActionsView: View {
         }
     }
     
+    
     func Call() {
         var amountToCall = 0
         showRaise = false
@@ -199,6 +150,7 @@ struct ActionsView: View {
         
         CheckEqualBets()
     }
+    
     
     func Check() {
         playersList.players[gameInfo.whoseTurn].hasPlayed = true
@@ -257,54 +209,28 @@ struct ActionsView: View {
     }
     
     var body: some View {
-        NavigationView {
-            VStack (alignment: .leading, spacing: 30) {
-                VStack (spacing: 20) {
-                    MoneyStatusView(text: "Current",
-                                    image1: "arrow.up.circle",
-                                    image2: "dollarsign.circle",
-                                    moneySpent: playersList.players[gameInfo.whoseTurn].spentThisRound,
-                                    totalMoney: playersList.players[gameInfo.whoseTurn].money)
-                    //                    MoneyStatusView(text: "Call",
-                    //                                    image1: "arrow.up.circle",
-                    //                                    image2: "dollarsign.circle",
-                    //                                    moneySpent: gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound,
-                    //                                    totalMoney: playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound))
-                    //                    if (showRaise) {
-                    //                        MoneyStatusView(text: "Raise",
-                    //                                        image1: "arrow.up.circle",
-                    //                                        image2: "dollarsign.circle",
-                    //                                        moneySpent: (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound) + amountRaised,
-                    //                                        totalMoney: playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound) - amountRaised)
-                    //                    }
-                }
-                
+        
+        VStack {
+            Text("\(playersList.players[gameInfo.whoseTurn].name)'s Actions")
+                .font(.system(size: 30, weight: .bold))
+                .padding(.top, 20)
+            HStack (spacing: 50) {
                 if ((gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound == 0) ||
                     playersList.players[gameInfo.whoseTurn].allIn) {
-                    Button {
-                        Check()
-                    } label: {
-                        HStack{
-                            Text("Check")
-                            Spacer()
-                            Image(systemName: "checkmark")
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(Color.green)
+                    ActionButton(Action: Check,
+                                 actionName: "Check",
+                                 imgName: "checkmark",
+                                 amountShown: 0,
+                                 color: .green)
+                    
                 } else if (!playersList.players[gameInfo.whoseTurn].allIn &&
                            playersList.players[gameInfo.whoseTurn].money > 0) {
-                    Button {
-                        Call()
-                    } label: {
-                        HStack{
-                            Text("Call")
-                            Spacer()
-                            Image(systemName: "dollarsign.circle")
-                            (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)
-                            < playersList.players[gameInfo.whoseTurn].money ? Text("\(gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)") : Text(" \(playersList.players[gameInfo.whoseTurn].money) (ALL IN)")
-                        }
-                    }.buttonStyle(.borderedProminent)
+                    ActionButton(Action: Call,
+                                 actionName: "Call",
+                                 imgName: "phone",
+                                 amountShown:  (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)
+                                 < playersList.players[gameInfo.whoseTurn].money ? gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound : playersList.players[gameInfo.whoseTurn].money,
+                                 color: .blue)
                 }
                 
                 if (showRaise) {
@@ -312,37 +238,49 @@ struct ActionsView: View {
                         Button {
                             SubmitRaise()
                         } label: {
-                            HStack{
+                            VStack {
+                                VStack {
+                                    Image(systemName: "arrow.up")
+                                        .padding(.top, 6)
+                                    Divider()
+                                        .frame(width: 50, height: 2)
+                                        .overlay(.gray)
+                                    (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound + amountRaised) == playersList.players[gameInfo.whoseTurn].money ?
+                                    Text("ALL IN")
+                                        .padding(.bottom, 10)
+                                    :Text("\(gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound) + \(amountRaised)")
+                                        .padding(.bottom, 10)
+                                }
+                                .frame(width: 70, height: 70)
+                                .overlay(Circle()
+                                    .stroke(lineWidth: 3))
                                 Text("Raise")
-                                Spacer()
-                                (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound + amountRaised) == playersList.players[gameInfo.whoseTurn].money ?
-                                Text("ALL IN") :
-                                Text("\(gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound) + $\(amountRaised)")
+                                //                            Stepper (value: $amountRaised,
+                                //                                     in: (playersList.players[gameInfo.whoseTurn].allIn ? 0...0 : gameInfo.minBet...playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound))) {}
                             }
-                        }
-                        .buttonStyle(.bordered)
-                        
-                        VStack{
-                            Text("Min Bet: \(gameInfo.minBet)")
-                            Text("Max Raise: \(playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound))")
+                            .foregroundColor(.gray)
                         }
                         
-                        Stepper (value: $amountRaised,
-                                 in: (playersList.players[gameInfo.whoseTurn].allIn ? 0...0 : gameInfo.minBet...playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound))) {}
+                        
                         
                     }
+                    
                 }
                 
-                Button (role: .destructive) {
-                    showFoldConfirmation = true
+                Button {
+                    showFoldConfirmation.toggle()
                 } label: {
-                    HStack{
+                    VStack {
+                        Text("X")
+                            .font(.system(size: 30, weight: .bold))
+                            .frame(width: 70, height: 70)
+                            .overlay(Circle()
+                                .stroke(lineWidth: 3))
                         Text("Fold")
-                        Spacer()
-                        Image(systemName: "x.circle")
                     }
+                    
                 }
-                .buttonStyle(.bordered)
+                .foregroundColor(.red)
                 .confirmationDialog("Confirm Fold", isPresented: $showFoldConfirmation) {
                     Button ("Fold", role: .destructive) {
                         Fold()
@@ -351,18 +289,44 @@ struct ActionsView: View {
                     Text("Are you sure?")
                 }
             }
-            .padding(.horizontal, 20)
             .onAppear(perform: ShowRaise)
-            .navigationTitle("\(playersList.players[gameInfo.whoseTurn].name)'s Actions")
-            .toolbar {
-                ToolbarItem (placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        showRaise = false
-                        dismiss()
+        }
+    }
+    
+    struct ActionButton: View {
+        var Action: () -> Void
+        
+        var actionName : String
+        var imgName: String
+        var amountShown: Int
+        var color: Color
+        
+        @EnvironmentObject var playersList: PlayersList
+        @EnvironmentObject var gameInfo: GameInfo
+        
+        var body: some View {
+            Button {
+                Action()
+            } label: {
+                VStack {
+                    VStack {
+                        Image(systemName: imgName)
+                            .padding(.top, 6)
+                        Divider()
+                            .frame(width: 50, height: 2)
+                            .overlay(color)
+                        Text("\(amountShown)")
+                            .padding(.bottom, 6)
+                        
                     }
+                    .frame(width: 70, height: 70)
+                    .overlay(Circle()
+                        .stroke(lineWidth: 3))
+                    Text("\(actionName)")
                 }
                 
             }
+            .foregroundColor(color)
         }
     }
     
@@ -390,4 +354,3 @@ struct ActionsView: View {
         }
     }
 }
-

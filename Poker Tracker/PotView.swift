@@ -22,13 +22,36 @@ class PotList: ObservableObject {
     @Published var totalBets = 0
 }
 
+
 struct PotView: View {
     @EnvironmentObject var gameInfo: GameInfo
     @EnvironmentObject var potList: PotList
     
+//    func AddNumberWithRollingAnimation(startNum: Int, targetNum: Int) {
+//        withAnimation {
+//            let animationDuration = 1000 // milliseconds
+//            let stepDuration = animationDuration / 30
+//
+//            for step in (0..<abs(targetNum)) {
+//                let updateTimeInterval = DispatchTimeInterval.milliseconds(step * stepDuration)
+//                let deadline = DispatchTime.now() + updateTimeInterval
+//
+//                DispatchQueue.main.asyncAfter(deadline: deadline) {
+//                    startNum = targetNum / abs(targetNum)
+//                }
+//            }
+//        }
+//    }
+    
     var body: some View {
         VStack {
             HStack (spacing: 30){
+//                Text("\(potList.pots[0].money)")
+//                    .background(Circle()
+//                    .scale(1.4)
+//                    .fill(.white))
+//                Button("TEST", action: { AddNumberWithRollingAnimation(startNum: potList.pots[0].money, targetNum: -10) })
+//                    .buttonStyle(.borderedProminent)
                 PipView(pipName: "suit.club.fill", color: Color.black)
                 PipView(pipName: "suit.heart.fill", color: Color.red)
                 PipView(pipName: "suit.spade.fill", color: Color.black)

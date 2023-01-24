@@ -33,60 +33,78 @@ struct PlayerHomeScreenRowView: View {
     
     @EnvironmentObject var playersList: PlayersList
     @EnvironmentObject var gameInfo: GameInfo
+    @State private var animateArrow = false
     
     var body: some View {
         HStack {
             if (player.myTurn && gameInfo.bettingRound != 0) {
                 Image(systemName: "arrow.right")
                     .foregroundColor(.red)
+                    .scaleEffect(animateArrow ? 0 : 1)
+                    .offset(x: animateArrow ? -40 : 0)
+                    .onAppear {
+                        animateArrow.toggle()
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.5)) {
+                            animateArrow.toggle()
+                        }
+                    }
             }
               
             switch (player.myRole) {
             case .None:
                 Text(player.name)
+                    .offset(x: animateArrow ? -20 : 0)
                     .foregroundColor(player.myTurn && gameInfo.bettingRound != 0 ? .red : .black)
             case .Dealer:
                 HStack {
                     Text(player.name)
                     Image(systemName: "crown")
-                        
                 }
+                .offset(x: animateArrow ? -20 : 0)
                 .foregroundColor(player.myTurn ? .red : .black)
             case .SmallBlind:
                 HStack {
                     Text(player.name)
-                        .foregroundColor(player.myTurn ? .red : .black)
                     Image(systemName: "eye.slash")
                         .imageScale(.small)
                 }
+                .offset(x: animateArrow ? -20 : 0)
                 .foregroundColor(player.myTurn ? .red : .black)
             case .BigBlind:
                 HStack {
                     Text(player.name)
                     Image(systemName: "eye.slash.fill")
                 }
+                .offset(x: animateArrow ? -20 : 0)
                 .foregroundColor(player.myTurn ? .red : .black)
             }
         
             Spacer()
             
             HStack {
-                Image(systemName: "arrow.up.circle")
-                Text("\(player.spentThisRound)")
+                if (player.spentThisRound > 0) {
+                    Image(systemName: "arrow.up.circle")
+                    Text("\(player.spentThisRound)")
+                }
             }
             .padding(.trailing, 10)
             .foregroundColor(player.myTurn && gameInfo.bettingRound != 0 ? .red : .black)
             
             HStack {
-                Image(systemName: "dollarsign.circle")
+                //Image(systemName: "dollarsign.circle")
                 Text("\(player.money)")
+                    .font(.system(size: 16, weight: .light))
+                    .frame(width: 30, height: 40)
+                    .overlay(Circle()
+                        .stroke(lineWidth: 2))
                     
             }
             .foregroundColor(player.myTurn && gameInfo.bettingRound != 0 ? .red : .secondary)
             
         }
-        .padding(.horizontal, 30)
+        .padding(.horizontal, 34)
         .frame(width: 300, height: 40)
+        //.animation(.easeInOut, value: player.myTurn && gameInfo.bettingRound != 0)
         .background(
             player.hasFolded
                 ?.ultraThinMaterial

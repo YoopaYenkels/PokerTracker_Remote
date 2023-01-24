@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C71365CA297F889D00A654CA /* AppNavBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71365C9297F889D00A654CA /* AppNavBarView.swift */; };
 		C7321F04296FD5D00077CF7D /* PotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7321F03296FD5D00077CF7D /* PotView.swift */; };
 		C7321F06297067A00077CF7D /* PlayersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7321F05297067A00077CF7D /* PlayersView.swift */; };
 		C7321F082970D0120077CF7D /* BottomBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7321F072970D0110077CF7D /* BottomBarView.swift */; };
@@ -21,6 +22,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C71365C9297F889D00A654CA /* AppNavBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavBarView.swift; sourceTree = "<group>"; };
 		C7321F03296FD5D00077CF7D /* PotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PotView.swift; sourceTree = "<group>"; };
 		C7321F05297067A00077CF7D /* PlayersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayersView.swift; sourceTree = "<group>"; };
 		C7321F072970D0110077CF7D /* BottomBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomBarView.swift; sourceTree = "<group>"; };
@@ -49,6 +51,7 @@
 		C74D32EB296CF28600654DE6 = {
 			isa = PBXGroup;
 			children = (
+				C71365C9297F889D00A654CA /* AppNavBarView.swift */,
 				C74D32F6296CF28600654DE6 /* Poker Tracker */,
 				C74D32F5296CF28600654DE6 /* Products */,
 			);
@@ -164,6 +167,7 @@
 				C74D32FA296CF28600654DE6 /* MainView.swift in Sources */,
 				C7321F082970D0120077CF7D /* BottomBarView.swift in Sources */,
 				C74D32F8296CF28600654DE6 /* Poker_TrackerApp.swift in Sources */,
+				C71365CA297F889D00A654CA /* AppNavBarView.swift in Sources */,
 				C7F02F58296DBAFF0021F341 /* PlayerManager.swift in Sources */,
 				C791A11E297611D700348973 /* GivePot.swift in Sources */,
 				C7321F06297067A00077CF7D /* PlayersView.swift in Sources */,
