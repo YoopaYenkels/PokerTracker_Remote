@@ -15,6 +15,7 @@ struct BottomBarView:View {
     
     @State private var showActions = false
     @State private var showRaise = false
+    @State private var showRaiseStepper = false
     @State private var showGivePot = false
     @State private var amountRaised = 0
     
@@ -47,9 +48,11 @@ struct BottomBarView:View {
                     .sheet(isPresented: $showActions) {
                         ActionsView(showRaise: $showRaise,
                                     amountRaised: $amountRaised,
+                                    showRaiseStepper: $showRaiseStepper,
                                     UpdateTurn: UpdateTurn,
                                     ApplyRoles: ApplyRoles,
-                                    NewBettingRound: NewBettingRound)
+                                    NewBettingRound: NewBettingRound
+                                    )
                         .presentationDetents([.fraction(0.2)])
                     }.onDisappear(perform: {
                         amountRaised = gameInfo.minBet

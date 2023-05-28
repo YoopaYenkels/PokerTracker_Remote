@@ -25,8 +25,10 @@ struct ActionsView: View {
     
     @Binding var showRaise: Bool
     @Binding var amountRaised: Int
-    
+    @Binding var showRaiseStepper: Bool
+
     @State private var showFoldConfirmation = false
+    @State private var animateRaise = false
     
     var UpdateTurn: () -> Void
     var ApplyRoles: () -> Void
@@ -160,15 +162,31 @@ struct ActionsView: View {
     }
     
     func ShowRaise() {
-        if ((gameInfo.minBet <= playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound))
-            && (gameInfo.numRaises < 3 ||
+        if (playersList.players[gameInfo.whoseTurn].money >= gameInfo.highestBet 
+            && (gameInfo.numRaises <= 3 ||
                 playersList.players.count == 2)) {
             showRaise = true
+        }
+        else {
+            showRaise = false
         }
         amountRaised = gameInfo.minBet
     }
     
+    func ShowRaiseStepper() {
+        showRaiseStepper = !showRaiseStepper
+    }
+    
+    func RaiseAnim() {
+        animateRaise.toggle()
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+            animateRaise.toggle()
+        }
+    }
+    
     func SubmitRaise() {
+        showRaiseStepper = false
+        
         let amountToCall = (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)
         
         if (amountToCall + amountRaised >= playersList.players[gameInfo.whoseTurn].money) {
@@ -183,7 +201,6 @@ struct ActionsView: View {
         gameInfo.numRaises += 1
         
         playersList.players[gameInfo.whoseTurn].hasPlayed = true
-        showRaise = false
         
         UpdateTurn()
         ApplyRoles()
@@ -192,7 +209,6 @@ struct ActionsView: View {
     }
     
     func Fold() {
-        showRaise = false
         playersList.players[gameInfo.whoseTurn].hasPlayed = true
         playersList.players[gameInfo.whoseTurn].hasFolded = true
         gameInfo.numActivePlayers -= 1
@@ -209,34 +225,35 @@ struct ActionsView: View {
     }
     
     var body: some View {
-        
         VStack {
             Text("\(playersList.players[gameInfo.whoseTurn].name)'s Actions")
                 .font(.system(size: 30, weight: .bold))
                 .padding(.top, 20)
             HStack (spacing: 50) {
-                if ((gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound == 0) ||
-                    playersList.players[gameInfo.whoseTurn].allIn) {
-                    ActionButton(Action: Check,
-                                 actionName: "Check",
-                                 imgName: "checkmark",
-                                 amountShown: 0,
-                                 color: .green)
-                    
-                } else if (!playersList.players[gameInfo.whoseTurn].allIn &&
-                           playersList.players[gameInfo.whoseTurn].money > 0) {
-                    ActionButton(Action: Call,
-                                 actionName: "Call",
-                                 imgName: "phone",
-                                 amountShown:  (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)
-                                 < playersList.players[gameInfo.whoseTurn].money ? gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound : playersList.players[gameInfo.whoseTurn].money,
-                                 color: .blue)
+                if (!showRaiseStepper) {
+                    if ((gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound == 0) ||
+                        playersList.players[gameInfo.whoseTurn].allIn) {
+                        ActionButton(Action: Check,
+                                     actionName: "Check",
+                                     imgName: "checkmark",
+                                     amountShown: 0,
+                                     color: .green)
+                        
+                    } else if (!playersList.players[gameInfo.whoseTurn].allIn &&
+                               playersList.players[gameInfo.whoseTurn].money > 0) {
+                        ActionButton(Action: Call,
+                                     actionName: "Call",
+                                     imgName: "phone",
+                                     amountShown:  (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound)
+                                     < playersList.players[gameInfo.whoseTurn].money ? gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound : playersList.players[gameInfo.whoseTurn].money,
+                                     color: .blue)
+                    }
                 }
                 
                 if (showRaise) {
                     HStack {
                         Button {
-                            SubmitRaise()
+                            ShowRaiseStepper()
                         } label: {
                             VStack {
                                 VStack {
@@ -252,45 +269,78 @@ struct ActionsView: View {
                                         .padding(.bottom, 10)
                                 }
                                 .frame(width: 70, height: 70)
+
                                 .overlay(Circle()
                                     .stroke(lineWidth: 3))
                                 Text("Raise")
-                                //                            Stepper (value: $amountRaised,
-                                //                                     in: (playersList.players[gameInfo.whoseTurn].allIn ? 0...0 : gameInfo.minBet...playersList.players[gameInfo.whoseTurn].money - (gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound))) {}
                             }
+                            .offset(x: animateRaise ? (showRaiseStepper ? 100 : -50) : 0)
+                            .padding(.leading, (showRaiseStepper ? 40 : 0))
                             .foregroundColor(.gray)
                         }
                         
-                        
-                        
+                        if (showRaiseStepper) {
+                            HStack {
+                                Stepper (value: $amountRaised,
+                                         in: (playersList.players[gameInfo.whoseTurn].money >= gameInfo.highestBet ?
+                                              
+                                              (gameInfo.minBet...playersList.players[gameInfo.whoseTurn].money - gameInfo.highestBet ) :
+                                                
+                                                (0...0)
+                                              )
+                                )
+                                {}
+                                    .scaleEffect(animateRaise ? 0 : 1)
+                                    .padding(.bottom, 30)
+                                    .padding(.trailing, 30)
+                                    .onAppear {
+                                        RaiseAnim()
+                                    }
+                                    .onDisappear() {
+                                        RaiseAnim()
+                                    }
+                                
+                                
+                                ActionButton(Action: SubmitRaise,
+                                             actionName: "Confirm",
+                                             imgName: "checkmark",
+                                             amountShown: gameInfo.highestBet - playersList.players[gameInfo.whoseTurn].spentThisRound + amountRaised,
+                                             color: .green)
+                                .offset(x: animateRaise ? (showRaiseStepper ? -100 : 50) : 0)
+                                .padding(.trailing, (showRaiseStepper ? 40 : 0))
+                            }
+  
+                        }
                     }
                     
                 }
                 
-                Button {
-                    showFoldConfirmation.toggle()
-                } label: {
-                    VStack {
-                        Text("X")
-                            .font(.system(size: 30, weight: .bold))
-                            .frame(width: 70, height: 70)
-                            .overlay(Circle()
-                                .stroke(lineWidth: 3))
-                        Text("Fold")
+                if (!showRaiseStepper) {
+                    Button {
+                        showFoldConfirmation.toggle()
+                    } label: {
+                        VStack {
+                            Text("X")
+                                .font(.system(size: 30, weight: .bold))
+                                .frame(width: 70, height: 70)
+                                .overlay(Circle()
+                                    .stroke(lineWidth: 3))
+                            Text("Fold")
+                        }
+                        
                     }
-                    
-                }
-                .foregroundColor(.red)
-                .confirmationDialog("Confirm Fold", isPresented: $showFoldConfirmation) {
-                    Button ("Fold", role: .destructive) {
-                        Fold()
+                    .foregroundColor(.red)
+                    .confirmationDialog("Confirm Fold", isPresented: $showFoldConfirmation) {
+                        Button ("Fold", role: .destructive) {
+                            Fold()
+                        }
+                    } message: {
+                        Text("Are you sure?")
                     }
-                } message: {
-                    Text("Are you sure?")
                 }
             }
-            .onAppear(perform: ShowRaise)
         }
+        .onAppear(perform: ShowRaise)
     }
     
     struct ActionButton: View {
@@ -351,6 +401,15 @@ struct ActionsView: View {
                 }
                 .foregroundColor(.secondary)
             }
+        }
+    }
+    
+    struct ActionsView_Previews: PreviewProvider {
+        static var previews: some View {
+            MainView()
+                .environmentObject(GameInfo())
+                .environmentObject(PlayersList())
+                .environmentObject(PotList())
         }
     }
 }

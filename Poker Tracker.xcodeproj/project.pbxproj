@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		C71365CA297F889D00A654CA /* AppNavBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71365C9297F889D00A654CA /* AppNavBarView.swift */; };
+		C71365CC297F8AA600A654CA /* CustomNavBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71365CB297F8AA600A654CA /* CustomNavBarView.swift */; };
+		C71365CE297F8EAB00A654CA /* CustomNavBarContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71365CD297F8EAB00A654CA /* CustomNavBarContainerView.swift */; };
 		C7321F04296FD5D00077CF7D /* PotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7321F03296FD5D00077CF7D /* PotView.swift */; };
 		C7321F06297067A00077CF7D /* PlayersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7321F05297067A00077CF7D /* PlayersView.swift */; };
 		C7321F082970D0120077CF7D /* BottomBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7321F072970D0110077CF7D /* BottomBarView.swift */; };
@@ -23,6 +25,8 @@
 
 /* Begin PBXFileReference section */
 		C71365C9297F889D00A654CA /* AppNavBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavBarView.swift; sourceTree = "<group>"; };
+		C71365CB297F8AA600A654CA /* CustomNavBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomNavBarView.swift; sourceTree = "<group>"; };
+		C71365CD297F8EAB00A654CA /* CustomNavBarContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomNavBarContainerView.swift; sourceTree = "<group>"; };
 		C7321F03296FD5D00077CF7D /* PotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PotView.swift; sourceTree = "<group>"; };
 		C7321F05297067A00077CF7D /* PlayersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayersView.swift; sourceTree = "<group>"; };
 		C7321F072970D0110077CF7D /* BottomBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomBarView.swift; sourceTree = "<group>"; };
@@ -52,6 +56,8 @@
 			isa = PBXGroup;
 			children = (
 				C71365C9297F889D00A654CA /* AppNavBarView.swift */,
+				C71365CB297F8AA600A654CA /* CustomNavBarView.swift */,
+				C71365CD297F8EAB00A654CA /* CustomNavBarContainerView.swift */,
 				C74D32F6296CF28600654DE6 /* Poker Tracker */,
 				C74D32F5296CF28600654DE6 /* Products */,
 			);
@@ -166,7 +172,9 @@
 				C7321F04296FD5D00077CF7D /* PotView.swift in Sources */,
 				C74D32FA296CF28600654DE6 /* MainView.swift in Sources */,
 				C7321F082970D0120077CF7D /* BottomBarView.swift in Sources */,
+				C71365CE297F8EAB00A654CA /* CustomNavBarContainerView.swift in Sources */,
 				C74D32F8296CF28600654DE6 /* Poker_TrackerApp.swift in Sources */,
+				C71365CC297F8AA600A654CA /* CustomNavBarView.swift in Sources */,
 				C71365CA297F889D00A654CA /* AppNavBarView.swift in Sources */,
 				C7F02F58296DBAFF0021F341 /* PlayerManager.swift in Sources */,
 				C791A11E297611D700348973 /* GivePot.swift in Sources */,

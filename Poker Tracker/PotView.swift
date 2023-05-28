@@ -80,7 +80,7 @@ struct PotView: View {
                                     ForEach (pot.canBeWonBy) {playerEligible in
                                         Text("\(playerEligible.name)")
                                     }
-                                } else { Text("None") }
+                                } else { Text("Betting In Progress...")}
                             } label: {
                                 Label {
                                     Text("Eligible Players")
